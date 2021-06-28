@@ -19,7 +19,7 @@ export default function Home() {
           <p className={styles.description}>{description}</p>
         </h1>
 
-        <div className={styles.grid}>
+        <div className="grid">
           <Link href="/docs">
             <div className={styles.card}>
               <h2>Documentation &rarr;</h2>
