@@ -11,10 +11,9 @@ export default function Home() {
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
-        <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className="main">
+      <main>
         <h1 className={styles.title}>
           <span className="accent">{title}</span>
           <p className={styles.description}>{description}</p>
@@ -35,12 +34,12 @@ export default function Home() {
             </a>
           </div>
 
-          <div className={styles.card}>
-            <a href="https://github.com/matievisthekat/spotify-playlist-generator" target="_blank">
-              <h2>Contribute &rarr;</h2>
-              <p>Are you a programmer? Consider adding to this project!</p>
-            </a>
-          </div>
+          <Link href="/categories">
+            <div className={styles.card}>
+              <h2>Categories &rarr;</h2>
+              <p>Check out the types of music each playlist is made up of</p>
+            </div>
+          </Link>
 
           <Link href="/login">
             <div className={styles.card}>

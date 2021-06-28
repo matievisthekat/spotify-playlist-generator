@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Head from "next/head";
 import { useRouter } from "next/router";
 import Mathias from "../public/mathias.png";
 import Matthew from "../public/matthew.png";
@@ -22,7 +23,12 @@ export default function NotFound() {
   };
 
   return (
-    <main className="main">
+    <main>
+      <Head>
+        <title>404 Not found</title>
+        <meta name="description" content="Page not found" />
+      </Head>
+
       <div className="container">
         <h1 className="accent">Uh Oh! You found a 404 page</h1>
         <h3>Choose a developer to take your anger out on</h3>
