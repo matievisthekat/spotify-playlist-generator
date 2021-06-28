@@ -1,3 +1,5 @@
+export const scope = ["playlist-modify-public"];
+
 export const categories = [
   { name: "Dance", desc: "Songs that are suitable to dance to" },
   { name: "Energetic", desc: "Songs that are high in energy" },
