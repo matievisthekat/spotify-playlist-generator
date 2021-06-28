@@ -1,0 +1,39 @@
+@import "./vars"
+
+.image
+  display: block
+  margin-bottom: 1rem
+
+.grid
+  display: flex
+  align-items: center
+  justify-content: space-evenly
+  flex-wrap: nowrap
+  margin-top: 1rem
+  align-content: center
+  width: 80%
+
+.developer
+  margin: 1rem
+  padding: 1.5rem
+  transition: box-shadow 0.3s ease
+  text-align: center
+  width: 100%
+  box-shadow: 0 0 3px 1px darken($black, 2%)
+
+  &:hover, &:active
+    box-shadow: 0 0 5px 3px lighten($green, 10%)
+    cursor: pointer
+
+@media (max-width: 700px)
+  .grid
+    width: 100%
+    flex-direction: column
+
+  .developer
+    width: 80%
+
+.back
+  margin-top: -0.5rem
+  @include accent()
+  @include link()

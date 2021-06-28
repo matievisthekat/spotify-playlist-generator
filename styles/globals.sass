@@ -1,8 +1,12 @@
+@import "./vars"
+
 html,
 body
   padding: 0
   margin: 0
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif
+  background-color: $black
+  color: $white
 
 a
   color: inherit
@@ -10,3 +14,23 @@ a
 
 *
   box-sizing: border-box
+
+.container
+  min-height: 100%
+  padding: 0 0.5rem
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
+  height: 100%
+
+.main
+  padding: 3rem 0
+  flex: 1
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
+
+.accent
+  @include accent

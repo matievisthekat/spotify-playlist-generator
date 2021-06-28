@@ -1,0 +1,15 @@
+$black: #181818
+$green: #1DB954
+$white: #b3b3b3
+
+@mixin link()
+  color: $green
+  text-decoration: none
+
+  &:hover, &:active
+    color: darken($green, 10%)
+    text-decoration: underline
+    cursor: pointer
+
+@mixin accent()
+  color: $green
