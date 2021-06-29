@@ -19,7 +19,9 @@ export default function Result(props: Props) {
 
   return (
     <>
-      <Modal show={props.showModal} close={close} />
+      <Modal show={props.showModal} close={close}>
+        <h4>{props.name}</h4>
+      </Modal>
       <div className={styles.result} onClick={open}>
         <img src={props.album.images[0].url} width={100} height={100} />
         <div>
