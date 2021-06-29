@@ -1,10 +1,8 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import qs from "querystring";
 import axios from "axios";
-import Cookies from "universal-cookie";
-
-const cookies = new Cookies();
+import { updater } from "../src/util";
 
 interface Props {
   secret: string;
@@ -45,8 +43,7 @@ export default function Callback({ secret, id, uri }: Props) {
         )
         .then(async ({ data }) => {
           const { access_token, refresh_token } = data;
-          cookies.set("access_token", access_token);
-          cookies.set("refresh_token", refresh_token);
+          updater.setAccessToken(access_token).setRefreshToken(refresh_token);
           router.push("/me");
         })
         .catch((err) => {

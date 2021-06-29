@@ -1,3 +1,7 @@
+import Updater from "../../spotify-oauth-refresher";
+
+export const updater = new Updater({ clientId: "76d4b7cc92a94b3197de9a8036bd64e1", clientSecret: "xxxx" });
+
 export const scope = ["playlist-modify-public"];
 
 export const categories = [
