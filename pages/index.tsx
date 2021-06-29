@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
 import { getCreds } from "../src/util";
 import styles from "../styles/Home.module.sass";
@@ -19,6 +20,9 @@ export default function Home({ id, secret }: Props) {
   const updater = new Updater({ clientId: id, clientSecret: secret });
   const description = "Generate playlists based on audio features (danceability, energy,tempo, etc...)";
   const title = "Spotify Playlist Generator";
+
+  const [loggedIn, setLoggedIn] = useState(false);
+  useEffect(() => setLoggedIn(!!updater.refreshToken), []);
 
   return (
     <div className="container">
@@ -55,7 +59,7 @@ export default function Home({ id, secret }: Props) {
             </div>
           </Link>
 
-          {updater.refreshToken ? (
+          {loggedIn ? (
             <Link href="/me">
               <div className={styles.card}>
                 <h2>Hello again &rarr;</h2>
