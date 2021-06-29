@@ -2849,6 +2849,14 @@ spdx-license-ids@^3.0.0:
   resolved "https://registry.yarnpkg.com/spdx-license-ids/-/spdx-license-ids-3.0.9.tgz#8a595135def9592bda69709474f1cbeea7c2467f"
   integrity sha512-Ki212dKK4ogX+xDo4CtOZBVIwhsKBEfsEEcwmJfLQzirgc2jIWdzg40Unxz/HzEUqM1WFzVlQSMF9kZZ2HboLQ==
 
+spotify-oauth-refresher@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/spotify-oauth-refresher/-/spotify-oauth-refresher-1.0.0.tgz#10342128d4a3e25a58f5c1eb7330b33a5978dff2"
+  integrity sha512-psh2lfW3ZLrZr8EWNS7lzcrHcWgCb1Ijn6BhAjOWoTHEcQj/jr8jtpUMlWHJOvXzWspqBxkHjhsWKYgPncLpgw==
+  dependencies:
+    axios "^0.21.1"
+    universal-cookie "^4.0.4"
+
 spotify-web-api-node@^5.0.2:
   version "5.0.2"
   resolved "https://registry.yarnpkg.com/spotify-web-api-node/-/spotify-web-api-node-5.0.2.tgz#683669b3ccc046a5a357300f151df93a2b3539fe"

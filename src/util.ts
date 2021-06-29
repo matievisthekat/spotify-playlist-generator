@@ -1,8 +1,8 @@
-import Updater from "../../spotify-oauth-refresher";
+import Updater from "spotify-oauth-refresher";
 
-export const updater = new Updater({ clientId: "76d4b7cc92a94b3197de9a8036bd64e1", clientSecret: "xxxx" });
+export const updater = new Updater({ clientId: "76d4b7cc92a94b3197de9a8036bd64e1" });
 
-export const scope = ["playlist-modify-public"];
+export const scope = ["playlist-modify-public", "playlist-modify-private"];
 
 export const categories = [
   { name: "Dance", desc: "Songs that are suitable to dance to" },
