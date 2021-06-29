@@ -1,0 +1,47 @@
+@import "./vars"
+
+.result
+  text-align: left
+  border-radius: 5px
+  box-shadow: 0 0 5px 5px darken($black, 1%)
+  background-color: lighten($black, 4%)
+  min-height: 8rem
+  width: 600px
+  margin-bottom: 1rem
+  padding: 0.7rem
+  transition-property: box-shadow
+  transition-duration: 0.35s
+
+  &:hover
+    box-shadow: 0 0 3px 3px $green
+
+  & > img
+    border-radius: 3px
+    margin-right: 0.7rem
+    display: inline-block
+    margin-top: 0
+    float: left
+
+  & > div > span
+    display: block
+
+  &:before, &:after
+    content: " "
+    display: table
+
+  &:after
+    clear: both
+
+@media (max-width: 700px)
+  .result
+    width: 100%
+
+.link
+  @include link()
+  color: lighten($black, 40%)
+
+  &:hover
+    color: lighten($black, 25%)
+
+.title:hover
+  text-decoration: underline
