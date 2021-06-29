@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import { updater } from "../src/util";
 import styles from "../styles/Home.module.sass";
 
 export default function Home() {
@@ -41,12 +42,21 @@ export default function Home() {
             </div>
           </Link>
 
-          <Link href="/login">
-            <div className={styles.card}>
-              <h2>Get Started &rarr;</h2>
-              <p>Login and start generating playlists!</p>
-            </div>
-          </Link>
+          {updater.refreshToken ? (
+            <Link href="/me">
+              <div className={styles.card}>
+                <h2>Hello again &rarr;</h2>
+                <p>Start generating playlists!</p>
+              </div>
+            </Link>
+          ) : (
+            <Link href="/login">
+              <div className={styles.card}>
+                <h2>Get Started &rarr;</h2>
+                <p>Login and start generating playlists!</p>
+              </div>
+            </Link>
+          )}
         </div>
       </main>
     </div>
