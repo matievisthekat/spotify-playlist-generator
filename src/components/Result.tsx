@@ -13,13 +13,17 @@ export default function Result(props: SpotifyApi.TrackObjectFull) {
           </a>
         </span>
         <span>
-          {props.artists.map((a, i) => (
-            <small key={i} style={{ marginRight: "0.5rem" }}>
-              <a href={a.external_urls.spotify} className={styles.link} target="_blank">
-                {a.name}
-              </a>
-            </small>
-          ))}
+          {props.artists
+            .map((a, i) => (
+              <small key={i}>
+                <a href={a.external_urls.spotify} className={styles.link} target="_blank">
+                  {a.name}
+                </a>
+              </small>
+            ))
+            .reduce((prev, curr) => (
+              <>{[prev, <span>, </span>, curr]}</>
+            ))}
         </span>
       </div>
     </div>
