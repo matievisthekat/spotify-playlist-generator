@@ -1,9 +1,22 @@
 import Head from "next/head";
 import Link from "next/link";
-import { updater } from "../src/util";
+import Updater from "spotify-oauth-refresher";
+import { getCreds } from "../src/util";
 import styles from "../styles/Home.module.sass";
 
-export default function Home() {
+interface Props {
+  id: string;
+  secret: string;
+}
+
+export async function getStaticProps() {
+  return {
+    props: getCreds(),
+  };
+}
+
+export default function Home({ id, secret }: Props) {
+  const updater = new Updater({ clientId: id, clientSecret: secret });
   const description = "Generate playlists based on audio features (danceability, energy,tempo, etc...)";
   const title = "Spotify Playlist Generator";
 

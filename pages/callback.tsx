@@ -2,7 +2,8 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import qs from "querystring";
 import axios from "axios";
-import { updater } from "../src/util";
+import { getCreds } from "../src/util";
+import Updater from "spotify-oauth-refresher";
 
 interface Props {
   secret: string;
@@ -12,16 +13,13 @@ interface Props {
 
 export async function getStaticProps() {
   return {
-    props: {
-      secret: process.env.SECRET,
-      id: process.env.ID,
-      uri: process.env.REDIRECT_URI,
-    },
+    props: getCreds(),
   };
 }
 
-export default function Callback({ secret, id, uri }: Props) {
+export default function Callback({ uri, id, secret }: Props) {
   const router = useRouter();
+  const updater = new Updater({ clientId: id, clientSecret: secret });
 
   useEffect(() => {
     const { code } = qs.parse(window.location.href.split("?")[1]);
@@ -36,7 +34,7 @@ export default function Callback({ secret, id, uri }: Props) {
           }),
           {
             headers: {
-              Authorization: `Basic ${Buffer.from(`${id}:${secret}`).toString("base64")}`,
+              Authorization: `Basic ${updater.base64Creds}`,
               "Content-Type": "application/x-www-form-urlencoded",
             },
           }

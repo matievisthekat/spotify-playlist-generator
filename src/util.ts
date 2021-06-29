@@ -1,6 +1,8 @@
-import Updater from "spotify-oauth-refresher";
-
-export const updater = new Updater({ clientId: "76d4b7cc92a94b3197de9a8036bd64e1" });
+export const getCreds = () => ({
+  id: process.env.ID as string,
+  secret: process.env.SECRET as string,
+  uri: process.env.REDIRECT_URI,
+});
 
 export const scope = ["playlist-modify-public", "playlist-modify-private"];
 

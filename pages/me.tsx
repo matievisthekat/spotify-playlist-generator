@@ -1,10 +1,23 @@
 import { useEffect, useState } from "react";
-import { updater } from "../src/util";
+import Updater from "spotify-oauth-refresher";
+import { getCreds } from "../src/util";
 
-export default function Me() {
+interface Props {
+  id: string;
+  secret: string;
+}
+
+export async function getStaticProps() {
+  return {
+    props: getCreds(),
+  };
+}
+
+export default function Me({ id, secret }: Props) {
   const [error, setError] = useState("");
   const [username, setUsername] = useState("");
   const [url, setUrl] = useState("");
+  const updater = new Updater({ clientId: id, clientSecret: secret });
 
   useEffect(() => {
     updater
