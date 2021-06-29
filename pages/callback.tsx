@@ -23,7 +23,6 @@ export async function getStaticProps() {
 }
 
 export default function Callback({ secret, id, uri }: Props) {
-  const [error, setError] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -63,7 +62,6 @@ export default function Callback({ secret, id, uri }: Props) {
     <div className="container">
       <main>
         <h1>Redirecting...</h1>
-        {error && <span className="error">{error}</span>}
       </main>
     </div>
   );
