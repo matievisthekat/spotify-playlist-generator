@@ -22,8 +22,9 @@ export default function Me({ id, secret }: Props) {
   const [searchErr, setSearchErr] = useState("");
   const [username, setUsername] = useState("");
   const [url, setUrl] = useState("");
-  const [query, setQuery] = useState("");
   const [result, setResult] = useState<SpotifyApi.TrackSearchResponse>();
+  const [query, setQuery] = useState("");
+  const [modal, setModal] = useState(-1);
 
   useEffect(() => {
     updater
@@ -87,7 +88,10 @@ export default function Me({ id, secret }: Props) {
             )}
 
             <div className={styles.container}>
-              {result && result.tracks.items.map((t, i) => <Result {...t} key={i} />)}
+              {result &&
+                result.tracks.items.map((t, i) => (
+                  <Result {...t} key={i} showModal={i === modal} setShowModal={(v: boolean) => setModal(v ? i : -1)} />
+                ))}
             </div>
           </main>
         </>
