@@ -90,7 +90,13 @@ export default function Me({ id, secret }: Props) {
             <div className={styles.container}>
               {result &&
                 result.tracks.items.map((t, i) => (
-                  <Result {...t} key={i} showModal={i === modal} setShowModal={(v: boolean) => setModal(v ? i : -1)} />
+                  <Result
+                    updater={updater}
+                    key={i}
+                    showModal={i === modal}
+                    setShowModal={(v: boolean) => setModal(v ? i : -1)}
+                    {...t}
+                  />
                 ))}
             </div>
           </main>
