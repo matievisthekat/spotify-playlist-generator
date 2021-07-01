@@ -17,6 +17,17 @@ export default function Result(props: Props) {
   const [error, setError] = useState("");
   const [features, setFeatures] = useState<SpotifyApi.AudioFeaturesObject>();
 
+  const showFeatures: (keyof SpotifyApi.AudioFeaturesObject)[] = [
+    "danceability",
+    "acousticness",
+    "energy",
+    "instrumentalness",
+    "liveness",
+    "speechiness",
+    "tempo",
+    "valence",
+  ];
+
   const open = () => {
     props.setShowModal(true);
     document.querySelector("body")?.classList.add("noscroll");
@@ -50,47 +61,12 @@ export default function Result(props: Props) {
           </span>
         ) : features ? (
           <div className={styles.features}>
-            <div>
-              <span>Danceability</span>
-              <div>
-                <PercentCircle value={features.danceability * 100} />
+            {showFeatures.map((f, i) => (
+              <div key={i}>
+                <span>{f.charAt(0).toUpperCase() + f.slice(1, f.length)}</span>
+                <PercentCircle value={(features[f] as number) * 100} />
               </div>
-            </div>
-
-            <div>
-              <span>Acousticness</span>
-              <div>{features.acousticness}</div>
-            </div>
-
-            <div>
-              <span>Energy</span>
-              <div>{features.energy}</div>
-            </div>
-
-            <div>
-              <span>Instrumentalness</span>
-              <div>{features.instrumentalness}</div>
-            </div>
-
-            <div>
-              <span>Liveness</span>
-              <div>{features.liveness}</div>
-            </div>
-
-            <div>
-              <span>Speechiness</span>
-              <div>{features.speechiness}</div>
-            </div>
-
-            <div>
-              <span>Tempo</span>
-              <div>{features.tempo}</div>
-            </div>
-
-            <div>
-              <span>Valence</span>
-              <div>{features.valence}</div>
-            </div>
+            ))}
           </div>
         ) : null}
       </Modal>
