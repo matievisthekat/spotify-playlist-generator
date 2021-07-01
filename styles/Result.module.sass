@@ -52,30 +52,6 @@ $tempos: ("LIGHT_SPEED": lighten($green, 10%), "VERY_FAST": lighten($green, 4%),
   flex-wrap: wrap
   margin-top: 2rem
 
-  & > div
-    text-align: center
-    color: inherit
-    margin: 0.7rem
-    padding: 0.5rem
-    text-decoration: none
-    border: 1px solid $white
-    border-radius: 10px
-    width: 45%
-
-    &:hover, &:active
-      color: $green
-      border-color: $green
-      cursor: pointer
-
-    & > span
-      display: block
-      margin-bottom: 1rem
-      font-weight: bolder
-
-    & > h1
-      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
-      line-height: 5.7rem
-
 @each $tempo, $colour in $tempos
   .tempo__#{$tempo}
     color: $colour

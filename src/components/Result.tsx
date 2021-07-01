@@ -3,7 +3,7 @@ import { ScaleLoader } from "react-spinners";
 import Updater from "spotify-oauth-refresher";
 import { nanoid } from "nanoid";
 import Modal from "./Modal";
-import PercentCircle from "./PercentCircle";
+import FeatureDisplay from "./FeatureDisplay";
 import styles from "../../styles/Result.module.sass";
 
 enum Tempo {
@@ -81,15 +81,19 @@ export default function Result(props: Props) {
         ) : features ? (
           <div className={styles.features}>
             {showFeatures.map((f, i) => (
-              <div key={i}>
-                <span>{(f.charAt(0).toUpperCase() + f.slice(1, f.length)).replace(/(iness|ness)$/g, "")}</span>
-                <PercentCircle value={(features[f] as number) * 100} />
-              </div>
+              <FeatureDisplay
+                title={(f.charAt(0).toUpperCase() + f.slice(1, f.length)).replace(/(iness|ness)$/g, "")}
+                displayLike="number"
+                value={(features[f] as number) * 100}
+                key={i}
+              />
             ))}
-            <div>
-              <span>Tempo</span>
-              <h1 className={tempo ? styles[`tempo__${Tempo[tempo]}`] : undefined}>{tempo && Tempo[tempo]}</h1>
-            </div>
+            <FeatureDisplay
+              title="Tempo"
+              displayLike="text"
+              text={Tempo[tempo || -1].replace("_", " ")}
+              className={tempo ? styles[`tempo__${Tempo[tempo]}`] : undefined}
+            />
           </div>
         ) : null}
       </Modal>
