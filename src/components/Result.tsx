@@ -82,7 +82,7 @@ export default function Result(props: Props) {
           <div className={styles.features}>
             {showFeatures.map((f, i) => (
               <div key={i}>
-                <span>{f.charAt(0).toUpperCase() + f.slice(1, f.length)}</span>
+                <span>{(f.charAt(0).toUpperCase() + f.slice(1, f.length)).replace(/(iness|ness)$/g, "")}</span>
                 <PercentCircle value={(features[f] as number) * 100} />
               </div>
             ))}
