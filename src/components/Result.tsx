@@ -6,6 +6,15 @@ import Modal from "./Modal";
 import PercentCircle from "./PercentCircle";
 import styles from "../../styles/Result.module.sass";
 
+enum Tempo {
+  "LIGHT_SPEED",
+  "VERY_FAST",
+  "FAST",
+  "MODERATE",
+  "SLOW",
+  "VERY_SLOW",
+}
+
 interface Props extends SpotifyApi.TrackObjectFull {
   showModal: boolean;
   setShowModal(v: boolean): void;
@@ -24,9 +33,19 @@ export default function Result(props: Props) {
     "instrumentalness",
     "liveness",
     "speechiness",
-    "tempo",
     "valence",
   ];
+
+  let tempo: Tempo | null = null;
+  if (features) {
+    const { tempo: t } = features;
+    if (t > 200) tempo = 0;
+    else if (t > 160) tempo = 1;
+    else if (t > 120) tempo = 2;
+    else if (t > 80) tempo = 3;
+    else if (t > 40) tempo = 4;
+    else tempo = 5;
+  }
 
   const open = () => {
     props.setShowModal(true);
@@ -67,6 +86,10 @@ export default function Result(props: Props) {
                 <PercentCircle value={(features[f] as number) * 100} />
               </div>
             ))}
+            <div>
+              <span>Tempo</span>
+              <h1 className={tempo ? styles[`tempo__${Tempo[tempo]}`] : undefined}>{tempo && Tempo[tempo]}</h1>
+            </div>
           </div>
         ) : null}
       </Modal>
