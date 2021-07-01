@@ -3,6 +3,7 @@ import { ScaleLoader } from "react-spinners";
 import Updater from "spotify-oauth-refresher";
 import { nanoid } from "nanoid";
 import Modal from "./Modal";
+import PercentCircle from "./PercentCircle";
 import styles from "../../styles/Result.module.sass";
 
 interface Props extends SpotifyApi.TrackObjectFull {
@@ -47,9 +48,51 @@ export default function Result(props: Props) {
           <span className={styles.loader}>
             <ScaleLoader loading={loading} color="#1DB954" />
           </span>
-        ) : (
-          <>features</>
-        )}
+        ) : features ? (
+          <div className={styles.features}>
+            <div>
+              <span>Danceability</span>
+              <div>
+                <PercentCircle value={features.danceability * 100} />
+              </div>
+            </div>
+
+            <div>
+              <span>Acousticness</span>
+              <div>{features.acousticness}</div>
+            </div>
+
+            <div>
+              <span>Energy</span>
+              <div>{features.energy}</div>
+            </div>
+
+            <div>
+              <span>Instrumentalness</span>
+              <div>{features.instrumentalness}</div>
+            </div>
+
+            <div>
+              <span>Liveness</span>
+              <div>{features.liveness}</div>
+            </div>
+
+            <div>
+              <span>Speechiness</span>
+              <div>{features.speechiness}</div>
+            </div>
+
+            <div>
+              <span>Tempo</span>
+              <div>{features.tempo}</div>
+            </div>
+
+            <div>
+              <span>Valence</span>
+              <div>{features.valence}</div>
+            </div>
+          </div>
+        ) : null}
       </Modal>
       <div className={styles.result} onClick={open}>
         <img src={props.album.images[0].url} width={100} height={100} />
