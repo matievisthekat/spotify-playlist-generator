@@ -1,0 +1,107 @@
+@use "sass:math"
+@import "./vars"
+
+$circle-width: 0.09em
+
+.rect-auto
+  clip: rect(auto, auto, auto, auto)
+
+.pie
+  position: absolute
+  width: 1 - (2 * $circle-width)
+  height: 1 - (2 * $circle-width)
+  clip: rect(0em, 0.5em, 1em, 0em)
+  border-radius: 50%
+  transform: rotate(0deg)
+
+.green
+  border: 0.08em solid $green
+
+.yellow
+  border: 0.08em solid $yellow
+
+.orange
+  border: 0.08em solid $orange
+
+.red
+  border: 0.08em solid $red
+
+.pie-fill
+  transform: rotate(180deg)
+
+.c100
+  position: relative
+  font-size: 120px
+  width: 1em
+  height: 1em
+  border-radius: 50%
+  float: left
+  margin: 0 0.1em 0.1em 0
+  background-color: $black
+  transform: rotate(0deg)
+
+  *, .c100 *:before, .c100 *:after
+    box-sizing: content-box
+
+  &.center
+    float: none
+    margin: 0 auto
+
+  > span
+    position: absolute
+    width: 100%
+    z-index: 1
+    left: 0
+    top: 0
+    width: 5em
+    line-height: 5em
+    font-size: 0.2em
+    color: lighten($green, 4%)
+    display: block
+    text-align: center
+    white-space: nowrap
+
+  &:after
+    position: absolute
+    top: $circle-width
+    left: $circle-width
+    display: block
+    content: " "
+    border-radius: 50%
+    background-color: lighten($black, 5%)
+    width: 1 - (2 * $circle-width)
+    height: 1 - (2 * $circle-width)
+
+  .slice
+    position: absolute
+    width: 1em
+    height: 1em
+    clip: rect(0em, 1em, 1em, 0.5em)
+
+  .bar
+    @extend .pie
+
+  @for $i from 51 through 100
+    &.p#{$i} .slice
+      @extend .rect-auto
+
+    &.p#{$i} .bar:after
+      @extend .pie-fill
+
+    &.p#{$i} .fill
+      @extend .pie
+      @extend .pie-fill
+
+  @for $i from 1 through 100
+    &.p#{$i} .bar
+      transform: rotate((math.div(360, 100) * $i) + deg)
+
+    &.p#{$i} .pie
+      @if $i > 74
+        border: 0.08em solid $green
+      @else if $i > 49
+        border: 0.08em solid $yellow
+      @else if $i > 24
+        border: 0.08em solid $orange
+      @else
+        border: 0.08em solid $red
