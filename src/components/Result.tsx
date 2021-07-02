@@ -4,7 +4,7 @@ import Updater from "spotify-oauth-refresher";
 import { nanoid } from "nanoid";
 import Modal from "./Modal";
 import FeatureDisplay from "./FeatureDisplay";
-import styles from "../../styles/Result.module.sass";
+import styles from "../../styles/components/Result.module.sass";
 
 enum Tempo {
   "LIGHT_SPEED",

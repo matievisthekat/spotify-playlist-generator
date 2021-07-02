@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
 import { getCreds } from "../src/util";
-import styles from "../styles/Home.module.sass";
+import styles from "../styles/pages/Home.module.sass";
 
 interface Props {
   id: string;

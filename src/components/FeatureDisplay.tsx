@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PercentCircle from "./PercentCircle";
-import styles from "../../styles/FeatureDisplay.module.sass";
+import styles from "../../styles/components/FeatureDisplay.module.sass";
 
 interface Props {
   title: string;

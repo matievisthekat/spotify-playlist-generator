@@ -1,4 +1,4 @@
-import styles from "../../styles/PercentCircle.module.sass";
+import styles from "../../styles/components/PercentCircle.module.sass";
 
 interface Props {
   value: number;

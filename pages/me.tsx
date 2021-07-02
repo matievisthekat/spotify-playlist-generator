@@ -3,7 +3,7 @@ import Updater from "spotify-oauth-refresher";
 import { getCreds } from "../src/util";
 import { DebounceInput } from "react-debounce-input";
 import Result from "../src/components/Result";
-import styles from "../styles/Me.module.sass";
+import styles from "../styles/pages/Me.module.sass";
 
 interface Props {
   id: string;

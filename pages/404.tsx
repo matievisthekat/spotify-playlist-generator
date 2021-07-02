@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Mathias from "../public/mathias.png";
 import Matthew from "../public/matthew.png";
 import Mateo from "../public/mateo.png";
-import styles from "../styles/404.module.sass";
+import styles from "../styles/pages/404.module.sass";
 
 interface DevImageProps {
   src: StaticImageData;

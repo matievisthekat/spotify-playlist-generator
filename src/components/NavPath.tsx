@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import styles from "../../styles/NavPath.module.sass";
+import styles from "../../styles/components/NavPath.module.sass";
 
 export default function NavPath() {
   const [paths, setPaths] = useState<string[]>([]);

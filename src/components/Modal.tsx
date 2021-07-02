@@ -1,5 +1,5 @@
 import { MutableRefObject, ReactNode, useEffect, useRef } from "react";
-import styles from "../../styles/Modal.module.sass";
+import styles from "../../styles/components/Modal.module.sass";
 
 interface Props {
   show?: boolean;

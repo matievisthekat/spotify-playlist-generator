@@ -1,6 +1,6 @@
 import Seo from "../src/components/Seo";
-import styles from "../styles/Categories.module.sass";
 import { categories } from "../src/util";
+import styles from "../styles/pages/Categories.module.sass";
 
 export default function Categories() {
   return (
