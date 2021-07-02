@@ -1,5 +1,5 @@
 import Seo from "../src/components/Seo";
-import { categories } from "../src/util";
+import { categories, toProperCase } from "../src/util";
 import styles from "../styles/pages/Categories.module.sass";
 
 export default function Categories() {
@@ -14,10 +14,10 @@ export default function Categories() {
         </h1>
 
         <div className="grid">
-          {categories.map((c, i) => (
+          {Object.entries(categories).map((c, i) => (
             <div className={styles.card} key={i}>
-              <h2>{c.name}</h2>
-              <p>{c.desc}</p>
+              <h2>{toProperCase(c[0])}</h2>
+              <p>{c[1]}</p>
             </div>
           ))}
         </div>

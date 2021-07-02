@@ -4,6 +4,7 @@ import Updater from "spotify-oauth-refresher";
 import { nanoid } from "nanoid";
 import Modal from "./Modal";
 import FeatureDisplay from "./FeatureDisplay";
+import { categories, CategoryName, toProperCase } from "../util";
 import styles from "../../styles/components/Result.module.sass";
 
 enum Tempo {
@@ -25,16 +26,6 @@ export default function Result(props: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [features, setFeatures] = useState<SpotifyApi.AudioFeaturesObject>();
-
-  const showFeatures: (keyof SpotifyApi.AudioFeaturesObject)[] = [
-    "danceability",
-    "acousticness",
-    "energy",
-    "instrumentalness",
-    "liveness",
-    "speechiness",
-    "valence",
-  ];
 
   let tempo: Tempo | null = null;
   if (features) {
@@ -80,20 +71,32 @@ export default function Result(props: Props) {
           </span>
         ) : features ? (
           <div className={styles.features}>
-            {showFeatures.map((f, i) => (
-              <FeatureDisplay
-                title={(f.charAt(0).toUpperCase() + f.slice(1, f.length)).replace(/(iness|ness)$/g, "")}
-                displayLike="number"
-                value={(features[f] as number) * 100}
-                key={i}
-              />
-            ))}
-            <FeatureDisplay
-              title="Tempo"
-              displayLike="text"
-              text={Tempo[tempo || -1].replace("_", " ")}
-              className={tempo ? styles[`tempo__${Tempo[tempo]}`] : undefined}
-            />
+            {Object.entries(categories).map((f, i) => {
+              const info = categories[f[0] as CategoryName];
+
+              if (f[0] === "tempo") {
+                return (
+                  <FeatureDisplay
+                    title="Tempo"
+                    displayLike="text"
+                    text={Tempo[tempo || -1].replace("_", " ")}
+                    className={tempo ? styles[`tempo__${Tempo[tempo]}`] : undefined}
+                    infoText={info}
+                    key={i}
+                  />
+                );
+              } else {
+                return (
+                  <FeatureDisplay
+                    title={toProperCase(f[0]).replace(/(iness|ness)$/g, "")}
+                    displayLike="number"
+                    value={(features[f[0] as CategoryName] as number) * 100}
+                    infoText={info}
+                    key={i}
+                  />
+                );
+              }
+            })}
           </div>
         ) : null}
       </Modal>
