@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import { toProperCase } from "../util";
 import styles from "../../styles/components/NavPath.module.sass";
 
 export default function NavPath() {
@@ -19,12 +20,7 @@ export default function NavPath() {
       ...name
         .split("/")
         .filter((n) => n.length > 0)
-        .map((n) =>
-          n
-            .split("-")
-            .map((w) => w.charAt(0).toUpperCase() + w.slice(1, w.length))
-            .join(" ")
-        ),
+        .map((n) => toProperCase(n.split("-").join(" "))),
     ]);
   };
 
