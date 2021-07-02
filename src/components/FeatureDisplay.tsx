@@ -20,7 +20,7 @@ export default function FeatureDisplay({ title, displayLike, text, value, infoTe
         <span>{title}</span>
         {displayLike === "number" ? <PercentCircle value={value || 0} /> : <h1 className={className}>{text}</h1>}
       </div>
-      <div className={`${styles.info} ${showInfo ? styles.show : ""}`}>{showInfo ? infoText : null}</div>
+      <div className={`${styles.info} ${showInfo ? styles.show : ""}`}>{infoText}</div>
     </div>
   );
 }
