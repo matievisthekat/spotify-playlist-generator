@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Updater from "spotify-oauth-refresher";
-import { getCreds } from "../src/util";
 import { DebounceInput } from "react-debounce-input";
-import Result from "../src/components/Result";
+import { getCreds } from "../src/util";
 import styles from "../styles/pages/Me.module.sass";
+import Result from "../src/components/Result";
+import LikedSongs from "../public/liked-songs.png";
 
 interface Props {
   id: string;
@@ -71,6 +73,13 @@ export default function Me({ id, secret }: Props) {
           </h2>
 
           <main>
+            <div className={styles.yourSongs}>
+              <span className={styles.likedSongsImg}>
+                <Image src={LikedSongs} width={100} height={100} />
+              </span>
+              Your Liked Songs
+            </div>
+
             <span style={{ marginBottom: "1rem" }}>Search for songs and view their audio features</span>
             <DebounceInput
               type="text"
