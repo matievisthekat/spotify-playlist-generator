@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import Updater from "spotify-oauth-refresher";
 import { DebounceInput } from "react-debounce-input";
+import Result from "../src/components/Result";
+import Playlist from "../src/components/Playlist";
 import { getCreds } from "../src/util";
 import styles from "../styles/pages/Me.module.sass";
-import Result from "../src/components/Result";
-import LikedSongs from "../public/liked-songs.png";
 
 interface Props {
   id: string;
@@ -23,8 +22,8 @@ export default function Me({ id, secret }: Props) {
   const [error, setError] = useState("");
   const [searchErr, setSearchErr] = useState("");
   const [username, setUsername] = useState("");
-  const [url, setUrl] = useState("");
   const [result, setResult] = useState<SpotifyApi.TrackSearchResponse>();
+  const [playlists, setPlaylists] = useState<SpotifyApi.ListOfCurrentUsersPlaylistsResponse>();
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState(-1);
 
@@ -34,10 +33,15 @@ export default function Me({ id, secret }: Props) {
         url: "https://api.spotify.com/v1/me",
         authType: "bearer",
       })
-      .then(({ data }) => {
-        setUsername(data.id);
-        setUrl(data.external_urls.spotify);
+      .then(({ data }) => setUsername(data.id))
+      .catch((err) => setError(err.message));
+
+    updater
+      .request({
+        url: "https://api.spotify.com/v1/me/playlists",
+        authType: "bearer",
       })
+      .then(({ data }) => setPlaylists(data))
       .catch((err) => setError(err.message));
   }, []);
 
@@ -61,23 +65,21 @@ export default function Me({ id, secret }: Props) {
 
   return (
     <div className="container">
+      <h2>
+        Hello,&nbsp;
+        <a href={`https://open.spotify.com/user/${username}`} className="link" target="_blank">
+          {username}
+        </a>
+      </h2>
+
       {error ? (
         <span className="error">{error}</span>
       ) : (
         <>
-          <h2>
-            Hello,&nbsp;
-            <a href={url} className="link" target="_blank">
-              {username}
-            </a>
-          </h2>
-
           <main>
-            <div className={styles.yourSongs}>
-              <span className={styles.likedSongsImg}>
-                <Image src={LikedSongs} width={100} height={100} />
-              </span>
-              Your Liked Songs
+            <div className={styles.playlists}>
+              <Playlist img="/liked-songs.png" name="Liked Songs" />
+              {playlists && playlists.items.map((p, i) => <Playlist key={i} img={p.images[0].url} name={p.name} />)}
             </div>
 
             <span style={{ marginBottom: "1rem" }}>Search for songs and view their audio features</span>
