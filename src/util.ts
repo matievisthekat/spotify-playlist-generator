@@ -13,6 +13,11 @@ export const toProperCase = (s: string) => {
 
 export const scope = ["playlist-modify-public", "playlist-modify-private"];
 
+export interface CredProps {
+  clientId: string;
+  clientSecret: string;
+}
+
 export type CategoryName =
   | "danceability"
   | "acousticness"

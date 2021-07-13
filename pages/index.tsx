@@ -2,7 +2,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
-import { getCreds } from "../src/util";
+import { CredProps, getCreds } from "../src/util";
 import styles from "../styles/pages/Home.module.sass";
 
 interface Props {
@@ -16,8 +16,8 @@ export async function getStaticProps() {
   };
 }
 
-export default function Home({ id, secret }: Props) {
-  const updater = new Updater({ clientId: id, clientSecret: secret });
+export default function Home({ clientId, clientSecret }: CredProps) {
+  const updater = new Updater({ clientId, clientSecret });
   const description = "Generate playlists based on audio features (danceability, energy,tempo, etc...)";
   const title = "Spotify Playlist Generator";
 

@@ -2,15 +2,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Updater from "spotify-oauth-refresher";
 import { DebounceInput } from "react-debounce-input";
-import Result from "../src/components/Result";
-import Playlist from "../src/components/Playlist";
-import { getCreds } from "../src/util";
-import styles from "../styles/pages/Me.module.sass";
-
-interface Props {
-  id: string;
-  secret: string;
-}
+import Result from "../../src/components/Result";
+import Playlist from "../../src/components/Playlist";
+import { CredProps, getCreds } from "../../src/util";
+import styles from "../../styles/pages/Me.module.sass";
 
 export async function getStaticProps() {
   return {
@@ -18,8 +13,8 @@ export async function getStaticProps() {
   };
 }
 
-export default function Me({ id, secret }: Props) {
-  const updater = new Updater({ clientId: id, clientSecret: secret });
+export default function Me({ clientId, clientSecret }: CredProps) {
+  const updater = new Updater({ clientId, clientSecret });
   const [error, setError] = useState("");
   const [searchErr, setSearchErr] = useState("");
   const [username, setUsername] = useState("");
