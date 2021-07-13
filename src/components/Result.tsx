@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, MouseEvent as ReactMousEvent } from "react";
 import { ScaleLoader } from "react-spinners";
 import Updater from "spotify-oauth-refresher";
 import { nanoid } from "nanoid";
-import Modal from "./Modal";
+import moment from "moment";
 import FeatureDisplay from "./FeatureDisplay";
+import ExplicitIcon from "./ExplicitIcon";
+import Modal from "./Modal";
 import { categories, CategoryName, toProperCase } from "../util";
 import styles from "../../styles/components/Result.module.sass";
 
@@ -16,16 +18,24 @@ enum Tempo {
   "VERY_SLOW",
 }
 
-interface Props extends SpotifyApi.TrackObjectFull {
+interface Props extends Omit<SpotifyApi.PlaylistTrackObject, "is_local" | "added_by" | "added_at"> {
   showModal: boolean;
   setShowModal(v: boolean): void;
   updater: Updater;
+  added_at?: string;
+  added_by?: SpotifyApi.UserObjectPublic;
+  is_local?: boolean;
+  compact?: boolean;
 }
 
-export default function Result(props: Props) {
+interface OnClickEvent extends ReactMousEvent<HTMLDivElement> {
+  target: HTMLElement;
+}
+
+export default function Result({ compact, added_at, added_by, track, updater, showModal, setShowModal }: Props) {
+  const [features, setFeatures] = useState<SpotifyApi.AudioFeaturesObject>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [features, setFeatures] = useState<SpotifyApi.AudioFeaturesObject>();
 
   let tempo: Tempo | null = null;
   if (features) {
@@ -38,15 +48,17 @@ export default function Result(props: Props) {
     else tempo = 5;
   }
 
-  const open = () => {
-    props.setShowModal(true);
+  const open = (e: OnClickEvent) => {
+    if (!e.target.classList.contains(styles.result)) return;
+
+    setShowModal(true);
     document.querySelector("body")?.classList.add("noscroll");
 
     if (!features) {
       setLoading(true);
-      props.updater
+      updater
         .request({
-          url: `https://api.spotify.com/v1/audio-features/${props.id}`,
+          url: `https://api.spotify.com/v1/audio-features/${track.id}`,
           authType: "bearer",
         })
         .then(({ data }) => setFeatures(data))
@@ -56,14 +68,14 @@ export default function Result(props: Props) {
   };
 
   const close = () => {
-    props.setShowModal(false);
+    setShowModal(false);
     document.querySelector("body")?.classList.remove("noscroll");
   };
 
   return (
     <>
-      <Modal show={props.showModal} close={close}>
-        <h4>{props.name}</h4>
+      <Modal show={showModal} close={close}>
+        <h4>{track.name}</h4>
         {error && <span className="error">{error}</span>}
         {loading ? (
           <span className={styles.loader}>
@@ -100,28 +112,38 @@ export default function Result(props: Props) {
           </div>
         ) : null}
       </Modal>
-      <div className={styles.result} onClick={open}>
-        <img src={props.album.images[0].url} width={100} height={100} />
-        <div>
-          <span className={styles.title}>
-            <a href={props.external_urls.spotify} target="_blank">
-              {props.name}
-            </a>
+      <div className={`${styles.result} ${compact ? styles.compact : styles.normal}`} onClick={open}>
+        <img src={track.album.images[0].url} width={compact ? 50 : 100} />
+        {added_at && added_by && (
+          <span className={styles.plInfo}>
+            <small>
+              {moment(added_at).fromNow()}
+              &nbsp;<strong>-</strong>&nbsp;
+              <a href={added_by?.external_urls.spotify} className={styles.link} target="_blank">
+                {added_by.id}
+              </a>
+            </small>
           </span>
-          <span>
-            {props.artists
-              .map((a, i) => (
-                <small key={i}>
-                  <a href={a.external_urls.spotify} className={styles.link} target="_blank">
-                    {a.name}
-                  </a>
-                </small>
-              ))
-              .reduce((prev, curr) => (
-                <>{[prev, <span key={nanoid()}>, </span>, curr]}</>
-              ))}
-          </span>
-        </div>
+        )}
+        <span className={styles.title}>
+          <a href={track.external_urls.spotify} target="_blank">
+            {track.name}
+          </a>
+        </span>
+        <span className={styles.artists}>
+          {track.explicit && <ExplicitIcon />}
+          {track.artists
+            .map((a, i) => (
+              <small key={i}>
+                <a href={a.external_urls.spotify} className={styles.link} target="_blank">
+                  {a.name}
+                </a>
+              </small>
+            ))
+            .reduce((prev, curr) => (
+              <>{[prev, <span key={nanoid()}>, </span>, curr]}</>
+            ))}
+        </span>
       </div>
     </>
   );

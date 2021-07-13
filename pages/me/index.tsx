@@ -124,7 +124,7 @@ export default function Me({ clientId, clientSecret }: CredProps) {
                     key={i}
                     showModal={i === modal}
                     setShowModal={(v: boolean) => setModal(v ? i : -1)}
-                    {...t}
+                    track={t}
                   />
                 ))}
             </div>
