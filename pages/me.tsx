@@ -23,7 +23,7 @@ export default function Me({ id, secret }: Props) {
   const [searchErr, setSearchErr] = useState("");
   const [username, setUsername] = useState("");
   const [result, setResult] = useState<SpotifyApi.TrackSearchResponse>();
-  const [playlists, setPlaylists] = useState<SpotifyApi.ListOfCurrentUsersPlaylistsResponse>();
+  const [playlists, setPlaylists] = useState<SpotifyApi.PlaylistObjectFull[]>();
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState(-1);
 
@@ -41,7 +41,7 @@ export default function Me({ id, secret }: Props) {
         url: "https://api.spotify.com/v1/me/playlists",
         authType: "bearer",
       })
-      .then(({ data }) => setPlaylists(data))
+      .then(({ data }) => setPlaylists(data.items))
       .catch((err) => setError(err.message));
   }, []);
 
@@ -79,7 +79,19 @@ export default function Me({ id, secret }: Props) {
           <main>
             <div className={styles.playlists}>
               <Playlist img="/liked-songs.png" name="Liked Songs" />
-              {playlists && playlists.items.map((p, i) => <Playlist key={i} img={p.images[0].url} name={p.name} />)}
+              {playlists && (
+                <>
+                  {playlists.slice(0, 2).map((p, i) => (
+                    <Playlist key={i} img={p.images[0].url} name={p.name} />
+                  ))}
+                  {playlists.length > 3 && (
+                    <Playlist
+                      img={<span style={{ fontSize: "4.5rem" }}>+{playlists.length - 3}</span>}
+                      name={`View ${playlists.length - 3} more`}
+                    />
+                  )}
+                </>
+              )}
             </div>
 
             <span style={{ marginBottom: "1rem" }}>Search for songs and view their audio features</span>
