@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
 import ExternalLink from "../../../src/components/ExternalLink";
+import Result from "../../../src/components/Result";
 import { CredProps, getCreds } from "../../../src/util";
 import styles from "../../../styles/pages/Playlist.module.sass";
 
@@ -21,6 +22,7 @@ export async function getStaticProps() {
 export default function Playlist({ clientId, clientSecret }: CredProps) {
   const updater = new Updater({ clientId, clientSecret });
   const [pl, setPl] = useState<SpotifyApi.PlaylistObjectFull>();
+  const [modal, setModal] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -43,10 +45,24 @@ export default function Playlist({ clientId, clientSecret }: CredProps) {
       <h2>{loading ? `Fetching playist ${id}...` : pl ? pl.name : `Failed to fetch playlist ${id}`}</h2>
       {pl && (
         <span className={styles.credits}>
-          Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.display_name}</ExternalLink>
+          Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.id}</ExternalLink>
         </span>
       )}
       {error && <span className="error">{error}</span>}
+      {pl && (
+        <div className={styles.tracks}>
+          {pl.tracks.items.map((t, i) => (
+            <Result
+              {...t}
+              setShowModal={(v: boolean) => setModal(v ? i : -1)}
+              showModal={modal === i}
+              updater={updater}
+              key={i}
+              compact
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
