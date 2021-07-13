@@ -1,6 +1,6 @@
 export const getCreds = () => ({
-  id: process.env.ID as string,
-  secret: process.env.SECRET as string,
+  clientId: process.env.ID as string,
+  clientSecret: process.env.SECRET as string,
   uri: process.env.REDIRECT_URI,
 });
 
@@ -16,6 +16,7 @@ export const scope = ["playlist-modify-public", "playlist-modify-private"];
 export interface CredProps {
   clientId: string;
   clientSecret: string;
+  uri: string;
 }
 
 export type CategoryName =
