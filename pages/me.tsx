@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import Updater from "spotify-oauth-refresher";
 import { DebounceInput } from "react-debounce-input";
 import Result from "../src/components/Result";
@@ -24,8 +25,10 @@ export default function Me({ id, secret }: Props) {
   const [username, setUsername] = useState("");
   const [result, setResult] = useState<SpotifyApi.TrackSearchResponse>();
   const [playlists, setPlaylists] = useState<SpotifyApi.PlaylistObjectFull[]>();
+  const [showMorePl, setShowMorePl] = useState(false);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState(-1);
+  const initialPlaylists = 2;
 
   useEffect(() => {
     updater
@@ -81,13 +84,20 @@ export default function Me({ id, secret }: Props) {
               <Playlist img="/liked-songs.png" name="Liked Songs" />
               {playlists && (
                 <>
-                  {playlists.slice(0, 2).map((p, i) => (
-                    <Playlist key={i} img={p.images[0].url} name={p.name} />
+                  {(showMorePl ? playlists : playlists.slice(0, initialPlaylists)).map((p, i) => (
+                    <Link href={`/me/playlist/${p.id}`}>
+                      <Playlist key={i} img={p.images[0].url} name={p.name} />
+                    </Link>
                   ))}
-                  {playlists.length > 3 && (
+                  {playlists.length > initialPlaylists && (
                     <Playlist
-                      img={<span style={{ fontSize: "4.5rem" }}>+{playlists.length - 3}</span>}
-                      name={`View ${playlists.length - 3} more`}
+                      img={
+                        <span style={{ fontSize: "4.5rem" }}>{`${showMorePl ? "-" : "+"}${
+                          playlists.length - initialPlaylists
+                        }`}</span>
+                      }
+                      name={`View ${playlists.length - initialPlaylists} ${showMorePl ? "less" : "more"}`}
+                      onClick={() => setShowMorePl(!showMorePl)}
                     />
                   )}
                 </>
