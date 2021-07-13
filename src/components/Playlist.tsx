@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, Ref } from "react";
 import styles from "../../styles/components/Playlist.module.sass";
 
 interface Props {
@@ -7,7 +7,7 @@ interface Props {
   onClick?: () => void;
 }
 
-export default function Playlist({ img, name, onClick }: Props) {
+export default function Playlist({ img, name, onClick }: Props, ref?: Ref<HTMLDivElement>) {
   return (
     <div className={styles.playlist} onClick={onClick}>
       {typeof img === "string" ? (

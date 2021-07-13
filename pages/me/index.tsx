@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, forwardRef } from "react";
 import Link from "next/link";
 import Updater from "spotify-oauth-refresher";
 import { DebounceInput } from "react-debounce-input";
@@ -7,6 +7,8 @@ import Playlist from "../../src/components/Playlist";
 import ExternalLink from "../../src/components/ExternalLink";
 import { CredProps, getCreds } from "../../src/util";
 import styles from "../../styles/pages/Me.module.sass";
+
+const PlaylistWithRef = forwardRef(Playlist);
 
 export async function getStaticProps() {
   return {
@@ -79,8 +81,8 @@ export default function Me({ clientId, clientSecret }: CredProps) {
               {playlists && (
                 <>
                   {(showMorePl ? playlists : playlists.slice(0, initialPlaylists)).map((p, i) => (
-                    <Link href={`/me/playlist/${p.id}`}>
-                      <Playlist key={i} img={p.images[0].url} name={p.name} />
+                    <Link href={`/me/playlist/${p.id}`} key={i}>
+                      <PlaylistWithRef img={p.images[0].url} name={p.name} />
                     </Link>
                   ))}
                   {playlists.length > initialPlaylists && (
