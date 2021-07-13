@@ -4,6 +4,7 @@ import Updater from "spotify-oauth-refresher";
 import { DebounceInput } from "react-debounce-input";
 import Result from "../../src/components/Result";
 import Playlist from "../../src/components/Playlist";
+import ExternalLink from "../../src/components/ExternalLink";
 import { CredProps, getCreds } from "../../src/util";
 import styles from "../../styles/pages/Me.module.sass";
 
@@ -65,9 +66,7 @@ export default function Me({ clientId, clientSecret }: CredProps) {
     <div className="container">
       <h2>
         Hello,&nbsp;
-        <a href={`https://open.spotify.com/user/${username}`} className="link" target="_blank">
-          {username}
-        </a>
+        <ExternalLink href={`https://open.spotify.com/user/${username}`}>{username}</ExternalLink>
       </h2>
 
       {error ? (
