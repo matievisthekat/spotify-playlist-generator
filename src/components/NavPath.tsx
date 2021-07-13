@@ -26,11 +26,20 @@ export default function NavPath() {
 
   return (
     <div className={styles.nav}>
-      {paths.map((p, i) => (
+      {paths.map((path, i) => (
         <span key={i}>
           <span className={styles.seperator}>/</span>
-          <Link href={`/${p === "Home" ? "" : p.toLowerCase().replace(" ", "-")}`}>
-            <span className={styles.part}>{p}</span>
+          <Link
+            href={`/${
+              path === "Home"
+                ? ""
+                : paths
+                    .slice(1, i + 1)
+                    .map((p) => p.toLowerCase().replace(" ", "-"))
+                    .join("/")
+            }`}
+          >
+            <span className={styles.part}>{path}</span>
           </Link>
         </span>
       ))}
