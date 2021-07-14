@@ -30,6 +30,7 @@ export default function NavPath() {
         <span key={i}>
           <span className={styles.seperator}>/</span>
           <Link
+            passHref
             href={`/${
               path === "Home"
                 ? ""

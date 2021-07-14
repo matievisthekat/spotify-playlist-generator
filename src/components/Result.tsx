@@ -113,20 +113,20 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
         ) : null}
       </Modal>
       <div className={`${styles.result} ${compact ? styles.compact : styles.normal}`} onClick={open}>
-        <img src={track.album.images[0].url} width={compact ? 50 : 100} />
+        <img src={track.album.images[0].url} width={compact ? 50 : 100} alt="Track album cover image" />
         {added_at && added_by && (
           <span className={styles.plInfo}>
             <small>
               {moment(added_at).fromNow()}
               &nbsp;<strong>-</strong>&nbsp;
-              <a href={added_by?.external_urls.spotify} className={styles.link} target="_blank">
+              <a href={added_by?.external_urls.spotify} className={styles.link} target="_blank" rel="noreferrer">
                 {added_by.id}
               </a>
             </small>
           </span>
         )}
         <span className={styles.title}>
-          <a href={track.external_urls.spotify} target="_blank">
+          <a href={track.external_urls.spotify} target="_blank" rel="noreferrer">
             {track.name}
           </a>
         </span>
@@ -135,7 +135,7 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
           {track.artists
             .map((a, i) => (
               <small key={i}>
-                <a href={a.external_urls.spotify} className={styles.link} target="_blank">
+                <a href={a.external_urls.spotify} className={styles.link} target="_blank" rel="noreferrer">
                   {a.name}
                 </a>
               </small>

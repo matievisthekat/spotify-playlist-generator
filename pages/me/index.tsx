@@ -81,7 +81,7 @@ export default function Me({ clientId, clientSecret }: CredProps) {
               {playlists && (
                 <>
                   {(showMorePl ? playlists : playlists.slice(0, initialPlaylists)).map((p, i) => (
-                    <Link href={`/me/playlist/${p.id}`} key={i}>
+                    <Link href={`/me/playlist/${p.id}`} key={i}  passHref>
                       <PlaylistWithRef img={p.images[0].url} name={p.name} />
                     </Link>
                   ))}

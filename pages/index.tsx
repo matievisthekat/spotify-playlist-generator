@@ -38,21 +38,21 @@ export default function Home({ clientId, clientSecret }: CredProps) {
         </h1>
 
         <div className="grid">
-          <Link href="/docs">
+          <Link href="/docs" passHref>
             <div className={styles.card}>
               <h2>Documentation &rarr;</h2>
-              <p>Find in-depth information about this app's functionality</p>
+              <p>Find in-depth information about this app&apos;s functionality</p>
             </div>
           </Link>
 
           <div className={styles.card}>
-            <a href="https://github.com/matievisthekat/spotify-playlist-generator" target="_blank">
+            <a href="https://github.com/matievisthekat/spotify-playlist-generator" target="_blank" rel="noreferrer">
               <h2>Code &rarr;</h2>
               <p>View the code that makes this app work!</p>
             </a>
           </div>
 
-          <Link href="/categories">
+          <Link href="/categories" passHref>
             <div className={styles.card}>
               <h2>Categories &rarr;</h2>
               <p>Check out the types of music each playlist is made up of</p>
@@ -60,14 +60,14 @@ export default function Home({ clientId, clientSecret }: CredProps) {
           </Link>
 
           {loggedIn ? (
-            <Link href="/me">
+            <Link href="/me" passHref>
               <div className={styles.card}>
                 <h2>Hello again &rarr;</h2>
                 <p>Start generating playlists!</p>
               </div>
             </Link>
           ) : (
-            <Link href="/login">
+            <Link href="/login" passHref>
               <div className={styles.card}>
                 <h2>Get Started &rarr;</h2>
                 <p>Login and start generating playlists!</p>

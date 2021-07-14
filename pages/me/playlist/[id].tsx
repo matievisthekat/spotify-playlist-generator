@@ -41,7 +41,7 @@ export default function Playlist({ clientId, clientSecret }: CredProps) {
 
   return (
     <div className="container">
-      {pl && <img style={{ marginTop: "3rem" }} src={pl.images[0].url} width={200} />}
+      {pl && <img style={{ marginTop: "3rem" }} src={pl.images[0].url} width={200} alt="Playlist cover image" />}
       <h2>{loading ? `Fetching playist ${id}...` : pl ? pl.name : `Failed to fetch playlist ${id}`}</h2>
       {pl && (
         <span className={styles.credits}>

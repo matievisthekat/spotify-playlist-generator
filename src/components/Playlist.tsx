@@ -11,7 +11,7 @@ export default function Playlist({ img, name, onClick }: Props, ref?: Ref<HTMLDi
   return (
     <div className={styles.playlist} onClick={onClick}>
       {typeof img === "string" ? (
-        <img src={img} width={100} height={100} />
+        <img src={img} width={100} alt="Playlist cover image" />
       ) : (
         <div className={styles.customImg}>{img}</div>
       )}
