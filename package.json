@@ -5,6 +5,7 @@
   "browserslist": [
     "defaults"
   ],
+  "homepage": "/spotify-playlist-generator",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
