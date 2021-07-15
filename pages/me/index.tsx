@@ -2,6 +2,8 @@ import { useEffect, useState, forwardRef } from "react";
 import Link from "next/link";
 import Updater from "spotify-oauth-refresher";
 import { DebounceInput } from "react-debounce-input";
+import InfiniteScroll from "react-infinite-scroller";
+import { ScaleLoader } from "react-spinners";
 import Result from "../../src/components/Result";
 import Playlist from "../../src/components/Playlist";
 import ExternalLink from "../../src/components/ExternalLink";
@@ -21,12 +23,33 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
   const [error, setError] = useState("");
   const [searchErr, setSearchErr] = useState("");
   const [username, setUsername] = useState("");
-  const [result, setResult] = useState<SpotifyApi.TrackSearchResponse>();
+  const [results, setResults] = useState<SpotifyApi.TrackObjectFull[]>();
   const [playlists, setPlaylists] = useState<SpotifyApi.PlaylistObjectFull[]>();
   const [showMorePl, setShowMorePl] = useState(false);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState(-1);
+  const [hasMore, setHasMore] = useState(true);
   const initialPlaylists = 2;
+
+  const search = (offset: number) => {
+    updater
+      .request<SpotifyApi.TrackSearchResponse>({
+        url: "https://api.spotify.com/v1/search",
+        params: {
+          type: "track",
+          q: query,
+          offset,
+        },
+        authType: "bearer",
+      })
+      .then(({ data }) => {
+        if (data.tracks.items.length <= 0) setHasMore(false);
+        if (offset !== 0 && results && data.tracks.items.length > 0) {
+          setResults([...results, ...data.tracks.items]);
+        } else setResults(data.tracks.items);
+      })
+      .catch((err) => setSearchErr(err.message));
+  };
 
   useEffect(() => {
     requireLogin(updater, authUrl);
@@ -50,21 +73,13 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
 
   useEffect(() => {
     if (query) {
-      updater
-        .request({
-          url: "https://api.spotify.com/v1/search",
-          params: {
-            type: "track",
-            q: query,
-            limit: 30,
-            offset: 0,
-          },
-          authType: "bearer",
-        })
-        .then((res) => setResult(res.data))
-        .catch((err) => setSearchErr(err.message));
+      search(0);
     }
   }, [query]);
+
+  const loadMore = (page: number) => {
+    search(20 * page);
+  };
 
   return (
     <div className="container">
@@ -121,16 +136,28 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
             )}
 
             <div className={styles.container}>
-              {result &&
-                result.tracks.items.map((t, i) => (
-                  <Result
-                    updater={updater}
-                    key={i}
-                    showModal={i === modal}
-                    setShowModal={(v: boolean) => setModal(v ? i : -1)}
-                    track={t}
-                  />
-                ))}
+              {results && (
+                <InfiniteScroll
+                  pageStart={0}
+                  hasMore={hasMore}
+                  loadMore={loadMore}
+                  loader={
+                    <div style={{ textAlign: "center" }}>
+                      <ScaleLoader loading={true} color="#1DB954" />
+                    </div>
+                  }
+                >
+                  {results.map((t, i) => (
+                    <Result
+                      key={i}
+                      updater={updater}
+                      showModal={i === modal}
+                      setShowModal={(v: boolean) => setModal(v ? i : -1)}
+                      track={t}
+                    />
+                  ))}
+                </InfiniteScroll>
+              )}
             </div>
           </main>
         </>
