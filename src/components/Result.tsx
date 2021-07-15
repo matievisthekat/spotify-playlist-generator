@@ -49,7 +49,13 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
   }
 
   const open = (e: OnClickEvent) => {
-    if (!e.target.classList.contains(styles.result)) return;
+    if (
+      !e.target.classList.contains(styles.result) &&
+      !e.target.classList.contains(styles.plInfo) &&
+      !e.target.classList.contains(styles.artists) &&
+      !e.target.classList.contains(styles.title)
+    )
+      return;
 
     setShowModal(true);
     document.querySelector("body")?.classList.add("noscroll");
