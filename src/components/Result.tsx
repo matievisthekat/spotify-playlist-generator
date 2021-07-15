@@ -97,7 +97,7 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
                   <FeatureDisplay
                     title="Tempo"
                     displayLike="text"
-                    text={Tempo[tempo || -1].replace("_", " ")}
+                    text={Tempo[tempo ?? -1].replace("_", "")}
                     className={tempo ? styles[`tempo__${Tempo[tempo]}`] : undefined}
                     infoText={info}
                     key={i}
