@@ -120,13 +120,13 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
       </Modal>
       <div className={`${styles.result} ${compact ? styles.compact : styles.normal}`} onClick={open}>
         <img src={track.album.images[0].url} width={compact ? 50 : 100} alt="Track album cover image" />
-        {added_at && added_by && (
+        {added_at && (
           <span className={styles.plInfo}>
             <small>
               {moment(added_at).fromNow()}
               &nbsp;<strong>-</strong>&nbsp;
               <a href={added_by?.external_urls.spotify} className={styles.link} target="_blank" rel="noreferrer">
-                {added_by.id}
+                {added_by?.id || "you"}
               </a>
             </small>
           </span>

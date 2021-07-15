@@ -79,7 +79,9 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
         <>
           <main>
             <div className={styles.playlists}>
-              <Playlist img="/liked-songs.png" name="Liked Songs" />
+              <Link href="/me/playlist/liked-songs" passHref>
+                <PlaylistWithRef img="/liked-songs.png" name="Liked Songs" />
+              </Link>
               {playlists && (
                 <>
                   {(showMorePl ? playlists : playlists.slice(0, initialPlaylists)).map((p, i) => (
