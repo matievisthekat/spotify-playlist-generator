@@ -1,7 +1,12 @@
+import Updater from "spotify-oauth-refresher";
+
 export const getCreds = () => ({
   clientId: process.env.ID as string,
   clientSecret: process.env.SECRET as string,
-  uri: process.env.REDIRECT_URI,
+  uri: process.env.REDIRECT_URI as string,
+  authUrl: `https://accounts.spotify.com/authorize?response_type=code&client_id=${
+    process.env.ID
+  }&scope=${encodeURIComponent(scope.join(" "))}&redirect_uri=${process.env.REDIRECT_URI}&show_dialog=true`,
 });
 
 export const toProperCase = (s: string) => {
@@ -11,12 +16,17 @@ export const toProperCase = (s: string) => {
     .join(" ");
 };
 
+export const requireLogin = (updater: Updater, authUrl: string) => {
+  if (!updater.accessToken || !updater.refreshToken) window.location.href = authUrl;
+};
+
 export const scope = ["playlist-modify-public", "playlist-modify-private"];
 
 export interface CredProps {
   clientId: string;
   clientSecret: string;
   uri: string;
+  authUrl: string;
 }
 
 export type CategoryName =

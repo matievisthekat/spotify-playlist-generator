@@ -5,7 +5,7 @@ import { DebounceInput } from "react-debounce-input";
 import Result from "../../src/components/Result";
 import Playlist from "../../src/components/Playlist";
 import ExternalLink from "../../src/components/ExternalLink";
-import { CredProps, getCreds } from "../../src/util";
+import { CredProps, getCreds, requireLogin } from "../../src/util";
 import styles from "../../styles/pages/Me.module.sass";
 
 const PlaylistWithRef = forwardRef(Playlist);
@@ -16,7 +16,7 @@ export async function getStaticProps() {
   };
 }
 
-export default function Me({ clientId, clientSecret }: CredProps) {
+export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
   const updater = new Updater({ clientId, clientSecret });
   const [error, setError] = useState("");
   const [searchErr, setSearchErr] = useState("");
@@ -29,6 +29,8 @@ export default function Me({ clientId, clientSecret }: CredProps) {
   const initialPlaylists = 2;
 
   useEffect(() => {
+    requireLogin(updater, authUrl);
+
     updater
       .request({
         url: "https://api.spotify.com/v1/me",
@@ -81,7 +83,7 @@ export default function Me({ clientId, clientSecret }: CredProps) {
               {playlists && (
                 <>
                   {(showMorePl ? playlists : playlists.slice(0, initialPlaylists)).map((p, i) => (
-                    <Link href={`/me/playlist/${p.id}`} key={i}  passHref>
+                    <Link href={`/me/playlist/${p.id}`} key={i} passHref>
                       <PlaylistWithRef img={p.images[0].url} name={p.name} />
                     </Link>
                   ))}

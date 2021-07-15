@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { scope } from "../src/util";
+import { getCreds, scope } from "../src/util";
 
 interface Props {
   url: string;
@@ -8,9 +8,7 @@ interface Props {
 export async function getStaticProps() {
   return {
     props: {
-      url: `https://accounts.spotify.com/authorize?response_type=code&client_id=${
-        process.env.ID
-      }&scope=${encodeURIComponent(scope.join(" "))}&redirect_uri=${process.env.REDIRECT_URI}&show_dialog=true`,
+      url: getCreds().authUrl,
     },
   };
 }

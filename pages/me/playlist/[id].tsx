@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
 import ExternalLink from "../../../src/components/ExternalLink";
 import Result from "../../../src/components/Result";
-import { CredProps, getCreds } from "../../../src/util";
+import { CredProps, getCreds, requireLogin } from "../../../src/util";
 import styles from "../../../styles/pages/Playlist.module.sass";
 
 export async function getStaticPaths() {
@@ -19,7 +19,7 @@ export async function getStaticProps() {
   };
 }
 
-export default function Playlist({ clientId, clientSecret }: CredProps) {
+export default function Playlist({ clientId, clientSecret, authUrl }: CredProps) {
   const updater = new Updater({ clientId, clientSecret });
   const [pl, setPl] = useState<SpotifyApi.PlaylistObjectFull>();
   const [modal, setModal] = useState(-1);
@@ -29,6 +29,8 @@ export default function Playlist({ clientId, clientSecret }: CredProps) {
   const { id } = router.query;
 
   useEffect(() => {
+    requireLogin(updater, authUrl);
+
     updater
       .request({
         url: `https://api.spotify.com/v1/playlists/${id}`,
