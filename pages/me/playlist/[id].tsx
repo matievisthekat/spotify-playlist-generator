@@ -36,8 +36,6 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   const { id } = router.query;
   const likedSongs = id === "liked-songs";
 
-  console.log(liked?.length, tracks?.length);
-
   const getTracks = (offset: number) => {
     if (likedSongs) {
       updater
@@ -51,7 +49,8 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           if (offset !== 0 && liked && data.items.length > 0) setLiked([...liked, ...data.items]);
           else setLiked(data.items);
         })
-        .catch((err) => setError(err.message));
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
     } else {
       updater
         .request<SpotifyApi.PlaylistTrackResponse>({
@@ -64,7 +63,8 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           if (offset !== 0 && tracks && data.items.length > 0) setTracks([...tracks, ...data.items]);
           else setTracks(data.items);
         })
-        .catch((err) => setError(err.message));
+        .catch((err) => setError(err.message))
+        .finally(() => setLoading(false));
     }
   };
 
