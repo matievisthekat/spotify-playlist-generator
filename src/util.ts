@@ -1,5 +1,12 @@
 import Updater from "spotify-oauth-refresher";
 
+export const removeEl = (arr: string[], item: string) => {
+  const newArr = new Array(...arr);
+  const index = newArr.indexOf(item);
+  if (index !== -1) newArr.splice(index, 1);
+  return newArr;
+};
+
 export const getCreds = () => ({
   clientId: process.env.ID as string,
   clientSecret: process.env.SECRET as string,

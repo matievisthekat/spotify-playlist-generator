@@ -1,0 +1,26 @@
+@import "../vars"
+
+.select
+  padding: 0.4rem
+  color: $white
+  background-color: lighten($black, 10%)
+  outline: none
+  border: none
+  border-radius: 3px
+  caret-color: darken($green, 5%)
+  transition-property: background-color
+  transition-duration: 0.2s
+  list-style: none
+
+  & > li:hover
+    background-color: $black
+    cursor: pointer
+
+  &:hover
+    cursor: pointer
+
+  & > li
+    padding: 0.3rem
+    transition-property: background-color
+    transition-duration: 0.2s
+    border-radius: 3px
