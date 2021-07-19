@@ -7,6 +7,7 @@ import InfiniteScroll from "react-infinite-scroller";
 import { ScaleLoader } from "react-spinners";
 import ExternalLink from "../../../src/components/ExternalLink";
 import Result from "../../../src/components/Result";
+import GenerateButton from "../../../src/components/GenerateButton";
 import { CredProps, getCreds, requireLogin } from "../../../src/util";
 import LikedSongs from "../../../public/liked.png";
 import styles from "../../../styles/pages/Playlist.module.sass";
@@ -28,17 +29,17 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   const updater = new Updater({ clientId, clientSecret });
   const [pl, setPl] = useState<SpotifyApi.SinglePlaylistResponse>();
   const [tracks, setTracks] = useState<SpotifyApi.PlaylistTrackObject[]>();
-  const [liked, setLiked] = useState<SpotifyApi.SavedTrackObject[]>();
+  const [likedSongs, setLikedSongs] = useState<SpotifyApi.SavedTrackObject[]>();
   const [modal, setModal] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
   const { id } = router.query;
-  const likedSongs = id === "liked";
+  const liked = id === "liked";
 
   const getTracks = (offset: number) => {
-    if (likedSongs) {
+    if (liked) {
       updater
         .request<SpotifyApi.UsersSavedTracksResponse>({
           url: "https://api.spotify.com/v1/me/tracks",
@@ -47,8 +48,8 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         })
         .then(({ data }) => {
           if (data.items.length <= 0) setHasMore(false);
-          if (offset !== 0 && liked && data.items.length > 0) setLiked([...liked, ...data.items]);
-          else setLiked(data.items);
+          if (offset !== 0 && likedSongs && data.items.length > 0) setLikedSongs([...likedSongs, ...data.items]);
+          else setLikedSongs(data.items);
         })
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
@@ -72,18 +73,19 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   useEffect(() => {
     requireLogin(updater, authUrl);
 
-    if (!likedSongs) {
+    if (!liked) {
       updater
         .request<SpotifyApi.SinglePlaylistResponse>({
           url: `https://api.spotify.com/v1/playlists/${id}`,
           authType: "bearer",
         })
-        .then(({ data }) => setPl(data))
+        .then(({ data }) => {
+          setPl(data);
+          getTracks(0);
+        })
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
-    }
-
-    getTracks(0);
+    } else getTracks(0);
   }, []);
 
   const loadMore = (page: number) => getTracks(50 * page);
@@ -95,7 +97,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           <img src={pl.images[0].url} width={200} height={200} alt="Playlist cover image" />
         </span>
       )}
-      {likedSongs && (
+      {liked && (
         <span className={styles.cover}>
           <Image src={LikedSongs} width={200} height={200} alt="Liked songs cover" />
         </span>
@@ -103,11 +105,12 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       <h2>
         {loading
           ? `Fetching playist ${id}...`
-          : liked
+          : likedSongs
           ? "Liked Songs"
           : pl
           ? pl.name
           : `Failed to fetch playlist ${id}`}
+        <GenerateButton href={`/gen/${liked ? "liked" : id}`} />
       </h2>
       {pl && (
         <span className={styles.credits}>
@@ -115,7 +118,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         </span>
       )}
       {error && <span className="error">{error}</span>}
-      {(tracks || liked) && (
+      {(tracks || likedSongs) && (
         <div className={styles.tracks}>
           <InfiniteScroll
             pageStart={0}
@@ -139,8 +142,8 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
                   compact
                 />
               ))}
-            {liked &&
-              liked.map((t, i) => (
+            {likedSongs &&
+              likedSongs.map((t, i) => (
                 <Result
                   {...t}
                   setShowModal={(v: boolean) => setModal(v ? i : -1)}
