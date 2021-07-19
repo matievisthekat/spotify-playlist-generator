@@ -93,6 +93,7 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
       ) : (
         <>
           <main>
+            <span style={{ marginBottom: "1rem" }}>Choose a base playlist to generate from</span>
             <div className={styles.playlists}>
               <Link href="/me/playlist/liked-songs" passHref>
                 <PlaylistWithRef img="/liked-songs.png" name="Liked Songs" />
@@ -119,7 +120,7 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
               )}
             </div>
 
-            <span style={{ marginBottom: "1rem" }}>Search for songs and view their audio features</span>
+            <span style={{ marginBottom: "1.8rem" }}>Or search for songs and view their audio features</span>
             <DebounceInput
               type="text"
               minLength={3}
