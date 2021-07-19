@@ -1,12 +1,12 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { nanoid } from "nanoid";
 import Updater from "spotify-oauth-refresher";
 import InfiniteScroll from "react-infinite-scroller";
 import { ScaleLoader } from "react-spinners";
 import ExternalLink from "../../../src/components/ExternalLink";
 import Result from "../../../src/components/Result";
-import Select from "../../../src/components/Select";
 import { CredProps, getCreds, requireLogin } from "../../../src/util";
 import LikedSongs from "../../../public/liked-songs.png";
 import styles from "../../../styles/pages/Playlist.module.sass";
@@ -24,8 +24,6 @@ export async function getStaticProps() {
   };
 }
 
-const sorts = ["default", "name-az", "name-za", "album-az", "album-za", "added-asc", "added-desc"];
-
 export default function Playlist({ clientId, clientSecret, authUrl }: CredProps) {
   const updater = new Updater({ clientId, clientSecret });
   const [pl, setPl] = useState<SpotifyApi.SinglePlaylistResponse>();
@@ -35,7 +33,6 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState("");
-  const [sorted, setSorted] = useState("");
   const router = useRouter();
   const { id } = router.query;
   const likedSongs = id === "liked-songs";
@@ -91,11 +88,6 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
 
   const loadMore = (page: number) => getTracks(50 * page);
 
-  const formatOption = (s: string) => {
-    const parts = s.split("-");
-    return `${parts[0][0].toUpperCase()}${parts[0].slice(1, parts[0].length)} ${parts[1]?.toUpperCase() || ""}`;
-  };
-
   return (
     <div className="container">
       {pl && (
@@ -122,11 +114,6 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.id}</ExternalLink>
         </span>
       )}
-      {(liked || tracks) && (
-        <span>
-          <Select onChange={(s) => setSorted(s)} formatOption={formatOption} options={sorts} />
-        </span>
-      )}
       {error && <span className="error">{error}</span>}
       {(tracks || liked) && (
         <div className={styles.tracks}>
@@ -134,8 +121,9 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
             pageStart={0}
             loadMore={loadMore}
             hasMore={hasMore}
+            initialLoad={false}
             loader={
-              <div style={{ textAlign: "center" }}>
+              <div style={{ textAlign: "center" }} key={nanoid()}>
                 <ScaleLoader loading={true} color="#1DB954" />
               </div>
             }
