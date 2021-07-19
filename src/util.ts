@@ -27,7 +27,12 @@ export const requireLogin = (updater: Updater, authUrl: string) => {
   if (!updater.accessToken || !updater.refreshToken) window.location.href = authUrl;
 };
 
-export const scope = ["playlist-modify-public", "playlist-modify-private", "user-library-read"];
+export const scope = [
+  "playlist-read-private",
+  "playlist-modify-public",
+  "playlist-modify-private",
+  "user-library-read",
+];
 
 export interface CredProps {
   clientId: string;
