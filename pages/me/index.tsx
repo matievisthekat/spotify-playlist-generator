@@ -97,8 +97,8 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
           <main>
             <span style={{ marginBottom: "1rem" }}>Choose a base playlist to generate from</span>
             <div className={styles.playlists}>
-              <Link href="/me/playlist/liked-songs" passHref>
-                <PlaylistWithRef img="/liked-songs.png" name="Liked Songs" />
+              <Link href="/me/playlist/liked" passHref>
+                <PlaylistWithRef img="/liked.png" name="Liked Songs" />
               </Link>
               {playlists && (
                 <>

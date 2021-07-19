@@ -8,7 +8,7 @@ import { ScaleLoader } from "react-spinners";
 import ExternalLink from "../../../src/components/ExternalLink";
 import Result from "../../../src/components/Result";
 import { CredProps, getCreds, requireLogin } from "../../../src/util";
-import LikedSongs from "../../../public/liked-songs.png";
+import LikedSongs from "../../../public/liked.png";
 import styles from "../../../styles/pages/Playlist.module.sass";
 
 export async function getStaticPaths() {
@@ -35,7 +35,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   const [error, setError] = useState("");
   const router = useRouter();
   const { id } = router.query;
-  const likedSongs = id === "liked-songs";
+  const likedSongs = id === "liked";
 
   const getTracks = (offset: number) => {
     if (likedSongs) {
