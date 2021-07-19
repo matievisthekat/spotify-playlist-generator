@@ -59,15 +59,17 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
         url: "https://api.spotify.com/v1/me",
         authType: "bearer",
       })
-      .then(({ data }) => setUsername(data.id))
-      .catch((err) => setError(err.message));
+      .then(({ data }) => {
+        setUsername(data.id);
 
-    updater
-      .request({
-        url: "https://api.spotify.com/v1/me/playlists",
-        authType: "bearer",
+        updater
+          .request({
+            url: "https://api.spotify.com/v1/me/playlists",
+            authType: "bearer",
+          })
+          .then(({ data }) => setPlaylists(data.items))
+          .catch((err) => setError(err.message));
       })
-      .then(({ data }) => setPlaylists(data.items))
       .catch((err) => setError(err.message));
   }, []);
 
