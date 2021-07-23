@@ -5,12 +5,12 @@ import { nanoid } from "nanoid";
 import Updater from "spotify-oauth-refresher";
 import InfiniteScroll from "react-infinite-scroller";
 import { ScaleLoader } from "react-spinners";
-import ExternalLink from "../../../src/components/ExternalLink";
-import Result from "../../../src/components/Result";
-import GenerateButton from "../../../src/components/GenerateButton";
-import { CredProps, getCreds, requireLogin } from "../../../src/util";
-import LikedSongs from "../../../public/liked.png";
-import styles from "../../../styles/pages/Playlist.module.sass";
+import ExternalLink from "../../../../src/components/ExternalLink";
+import Result from "../../../../src/components/Result";
+import GenerateButton from "../../../../src/components/GenerateButton";
+import { CredProps, getCreds, requireLogin } from "../../../../src/util";
+import LikedSongs from "../../../../public/liked.png";
+import styles from "../../../../styles/pages/Playlist.module.sass";
 
 export async function getStaticPaths() {
   return {
@@ -110,7 +110,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           : pl
           ? pl.name
           : `Failed to fetch playlist ${id}`}
-        <GenerateButton href={`/me/gen/${liked ? "liked" : id}`} />
+        <GenerateButton href={`/me/playlist/${liked ? "liked" : id}/generate`} />
       </h2>
       {pl && (
         <span className={styles.credits}>
