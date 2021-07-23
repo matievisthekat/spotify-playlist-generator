@@ -110,13 +110,14 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           : pl
           ? pl.name
           : `Failed to fetch playlist ${id}`}
-        <GenerateButton href={`/gen/${liked ? "liked" : id}`} />
+        <GenerateButton href={`/me/gen/${liked ? "liked" : id}`} />
       </h2>
       {pl && (
         <span className={styles.credits}>
           Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.id}</ExternalLink>
         </span>
       )}
+      {pl && <span>{pl.description}</span>}
       {error && <span className="error">{error}</span>}
       {(tracks || likedSongs) && (
         <div className={styles.tracks}>
