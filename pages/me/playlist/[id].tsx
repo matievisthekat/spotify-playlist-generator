@@ -119,51 +119,53 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       )}
       {pl && <span>{pl.description}</span>}
       {error && <span className="error">{error}</span>}
-      {(tracks || likedSongs) && (
-        <div className={styles.tracks}>
-          <InfiniteScroll
-            pageStart={0}
-            loadMore={loadMore}
-            initialLoad={false}
-            hasMore={hasMore}
-            loader={
-              <div style={{ textAlign: "center" }} key={nanoid()}>
-                <ScaleLoader loading={hasMore} color="#1DB954" />
-              </div>
-            }
-          >
-            {tracks &&
-              tracks.map((t, i) => (
-                <Result
-                  {...t}
-                  setShowModal={(v: boolean) => setModal(v ? i : -1)}
-                  showModal={modal === i}
-                  updater={updater}
-                  key={i}
-                  compact
-                />
-              ))}
-            {likedSongs &&
-              likedSongs.map((t, i) => (
-                <Result
-                  {...t}
-                  added_by={{
-                    id: "you",
-                    href: "https://api.spotify.com/v1/me",
-                    type: "user",
-                    uri: "spotify:user:me",
-                    external_urls: { spotify: "https://open.spotify.com" },
-                  }}
-                  setShowModal={(v: boolean) => setModal(v ? i : -1)}
-                  showModal={modal === i}
-                  updater={updater}
-                  key={i}
-                  compact
-                />
-              ))}
-          </InfiniteScroll>
-        </div>
-      )}
+      <main>
+        {(tracks || likedSongs) && (
+          <div className={styles.tracks}>
+            <InfiniteScroll
+              pageStart={0}
+              loadMore={loadMore}
+              initialLoad={false}
+              hasMore={hasMore}
+              loader={
+                <div style={{ textAlign: "center" }} key={nanoid()}>
+                  <ScaleLoader loading={hasMore} color="#1DB954" />
+                </div>
+              }
+            >
+              {tracks &&
+                tracks.map((t, i) => (
+                  <Result
+                    {...t}
+                    setShowModal={(v: boolean) => setModal(v ? i : -1)}
+                    showModal={modal === i}
+                    updater={updater}
+                    key={i}
+                    compact
+                  />
+                ))}
+              {likedSongs &&
+                likedSongs.map((t, i) => (
+                  <Result
+                    {...t}
+                    added_by={{
+                      id: "you",
+                      href: "https://api.spotify.com/v1/me",
+                      type: "user",
+                      uri: "spotify:user:me",
+                      external_urls: { spotify: "https://open.spotify.com" },
+                    }}
+                    setShowModal={(v: boolean) => setModal(v ? i : -1)}
+                    showModal={modal === i}
+                    updater={updater}
+                    key={i}
+                    compact
+                  />
+                ))}
+            </InfiniteScroll>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
