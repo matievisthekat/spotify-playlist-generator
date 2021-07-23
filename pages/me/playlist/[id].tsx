@@ -63,7 +63,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         .then(({ data }) => {
           if (data.items.length <= 0) setHasMore(false);
           if (offset !== 0 && tracks && data.items.length > 0) setTracks([...tracks, ...data.items]);
-          else setTracks(data.items);
+          else if (data.items.length > 0) setTracks(data.items);
         })
         .catch((err) => setError(err.message))
         .finally(() => setLoading(false));
@@ -123,11 +123,11 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           <InfiniteScroll
             pageStart={0}
             loadMore={loadMore}
-            hasMore={hasMore}
             initialLoad={false}
+            hasMore={hasMore}
             loader={
               <div style={{ textAlign: "center" }} key={nanoid()}>
-                <ScaleLoader loading={true} color="#1DB954" />
+                <ScaleLoader loading={hasMore} color="#1DB954" />
               </div>
             }
           >
@@ -146,6 +146,13 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
               likedSongs.map((t, i) => (
                 <Result
                   {...t}
+                  added_by={{
+                    id: "you",
+                    href: "https://api.spotify.com/v1/me",
+                    type: "user",
+                    uri: "spotify:user:me",
+                    external_urls: { spotify: "https://open.spotify.com" },
+                  }}
                   setShowModal={(v: boolean) => setModal(v ? i : -1)}
                   showModal={modal === i}
                   updater={updater}

@@ -78,6 +78,14 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
     document.querySelector("body")?.classList.remove("noscroll");
   };
 
+  if (added_by?.uri === "spotify:user:") {
+    added_by = Object.assign(added_by, {
+      id: "spotify",
+      external_urls: { spotify: "https://open.spotify.com/user/spotify" },
+      uri: "spotify:user:spotify",
+    });
+  }
+
   return (
     <>
       <Modal show={showModal} close={close}>
@@ -126,7 +134,7 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
               {moment(added_at).fromNow()}
               &nbsp;<strong>-</strong>&nbsp;
               <a href={added_by?.external_urls.spotify} className={styles.link} target="_blank" rel="noreferrer">
-                {added_by?.id || "you"}
+                {added_by?.display_name || added_by?.id}
               </a>
             </small>
           </span>
