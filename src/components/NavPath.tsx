@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
-import { toProperCase } from "../util";
 import styles from "../../styles/components/NavPath.module.sass";
 
 export default function NavPath() {
@@ -15,13 +14,7 @@ export default function NavPath() {
 
   const update = () => {
     const name = window.location.pathname;
-    setPaths([
-      "Home",
-      ...name
-        .split("/")
-        .filter((n) => n.length > 0)
-        .map((n) => toProperCase(n.split("-").join(" "))),
-    ]);
+    setPaths(["Home", ...name.split("/").filter((n) => n.length > 0)]);
   };
 
   return (
@@ -29,17 +22,7 @@ export default function NavPath() {
       {paths.map((path, i) => (
         <span key={i}>
           <span className={styles.seperator}>/</span>
-          <Link
-            passHref
-            href={`/${
-              path === "Home"
-                ? ""
-                : paths
-                    .slice(1, i + 1)
-                    .map((p) => p.toLowerCase().replace(" ", "-"))
-                    .join("/")
-            }`}
-          >
+          <Link passHref href={`/${path === "Home" ? "" : paths.slice(1, i + 1).join("/")}`}>
             <span className={styles.part}>{path}</span>
           </Link>
         </span>
