@@ -104,6 +104,7 @@ export default function Generate(creds: CredProps) {
           </>
         )}
       </div>
+      {error && <span className="error">{error}</span>}
     </div>
   );
 }
