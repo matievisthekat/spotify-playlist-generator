@@ -37,17 +37,6 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  let tempo: Tempo | null = null;
-  if (features) {
-    const { tempo: t } = features;
-    if (t > 200) tempo = 0;
-    else if (t > 160) tempo = 1;
-    else if (t > 120) tempo = 2;
-    else if (t > 80) tempo = 3;
-    else if (t > 40) tempo = 4;
-    else tempo = 5;
-  }
-
   const open = (e: OnClickEvent) => {
     if (
       !e.target.classList.contains(styles.result) &&
@@ -102,14 +91,7 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
 
               if (f[0] === "tempo") {
                 return (
-                  <FeatureDisplay
-                    title="Tempo"
-                    displayLike="text"
-                    text={Tempo[tempo ?? -1].replace("_", "")}
-                    className={typeof tempo === "number" ? styles[`tempo__${Tempo[tempo]}`] : undefined}
-                    infoText={info}
-                    key={i}
-                  />
+                  <FeatureDisplay title="Tempo" displayLike="text" text={`${features.tempo}`} infoText={info} key={i} />
                 );
               } else {
                 return (
