@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
 import styles from "../../styles/components/GenerateButton.module.sass";
 
 interface Props {
@@ -10,7 +11,7 @@ export default function GenerateButton({ href }: Props) {
 
   return (
     <span className={styles.container} onClick={() => router.push(href)}>
-      &rarr;
+      <ArrowForwardIcon />
     </span>
   );
 }
