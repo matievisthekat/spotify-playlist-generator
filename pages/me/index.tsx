@@ -109,11 +109,7 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
                   ))}
                   {playlists.length > initialPlaylists && (
                     <Playlist
-                      img={
-                        <span style={{ fontSize: "4.5rem" }}>{`${showMorePl ? "-" : "+"}${
-                          playlists.length - initialPlaylists
-                        }`}</span>
-                      }
+                      img={<span style={{ fontSize: "4.5rem" }}>{showMorePl ? "-" : "+"}</span>}
                       name={`View ${playlists.length - initialPlaylists} ${showMorePl ? "less" : "more"}`}
                       onClick={() => setShowMorePl(!showMorePl)}
                     />
@@ -139,7 +135,7 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
             )}
 
             <div className={styles.container}>
-              {results && (
+              {results && results.length > 0 ? (
                 <InfiniteScroll
                   pageStart={0}
                   hasMore={hasMore}
@@ -160,6 +156,8 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
                     />
                   ))}
                 </InfiniteScroll>
+              ) : (
+                "no results"
               )}
             </div>
           </main>
