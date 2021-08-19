@@ -14,7 +14,7 @@ export default function NavPath() {
 
   const update = () => {
     const name = window.location.pathname;
-    setPaths(["Home", ...name.split("/").filter((n) => n.length > 0)]);
+    setPaths(["home", ...name.split("/").filter((n) => n.length > 0)]);
   };
 
   return (
@@ -22,7 +22,7 @@ export default function NavPath() {
       {paths.map((path, i) => (
         <span key={i}>
           <span className={styles.seperator}>/</span>
-          <Link passHref href={`/${path === "Home" ? "" : paths.slice(1, i + 1).join("/")}`}>
+          <Link passHref href={`/${path === "home" ? "" : paths.slice(1, i + 1).join("/")}`}>
             <span className={styles.part}>{path}</span>
           </Link>
         </span>
