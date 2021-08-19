@@ -9,15 +9,6 @@ import Modal from "./Modal";
 import { categories, CategoryName, toProperCase } from "../util";
 import styles from "../../styles/components/Result.module.sass";
 
-enum Tempo {
-  "LIGHT_SPEED",
-  "VERY_FAST",
-  "FAST",
-  "MODERATE",
-  "SLOW",
-  "VERY_SLOW",
-}
-
 interface Props extends Omit<SpotifyApi.PlaylistTrackObject, "is_local" | "added_by" | "added_at"> {
   showModal: boolean;
   setShowModal(v: boolean): void;
@@ -109,7 +100,12 @@ export default function Result({ compact, added_at, added_by, track, updater, sh
         ) : null}
       </Modal>
       <div className={`${styles.result} ${compact ? styles.compact : styles.normal}`} onClick={open}>
-        <img src={track.album.images[0].url} width={compact ? 50 : 100} alt="Track album cover image" />
+        <img
+          className={styles.img}
+          src={track.album.images[0].url}
+          width={compact ? 50 : 100}
+          alt="Track album cover image"
+        />
         {added_at && (
           <span className={styles.plInfo}>
             <small>

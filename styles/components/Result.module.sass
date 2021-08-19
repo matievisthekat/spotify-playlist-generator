@@ -1,7 +1,5 @@
 @import "../vars"
 
-$tempos: ("LIGHTSPEED": lighten($green, 10%), "VERYFAST": lighten($green, 4%), "FAST": $green, "MODERATE": $yellow, "SLOW": $orange, "VERYSLOW": $red)
-
 .result
   text-align: left
   background-color: lighten($black, 4%)
@@ -27,7 +25,7 @@ $tempos: ("LIGHTSPEED": lighten($green, 10%), "VERYFAST": lighten($green, 4%), "
     box-shadow: 0 0 3px 3px $green
     cursor: pointer
 
-  & > img
+  & > .img
     border-radius: 3px
     margin-right: 0.7rem
     display: inline-block
@@ -39,6 +37,12 @@ $tempos: ("LIGHTSPEED": lighten($green, 10%), "VERYFAST": lighten($green, 4%), "
 
   & > .artists
     display: block
+
+  &.shadow > .title
+    margin-left: 3.5rem
+
+  &.shadow > .artists
+    margin-left: 3.5rem
 
   & > .plInfo
     float: right
@@ -66,10 +70,6 @@ $tempos: ("LIGHTSPEED": lighten($green, 10%), "VERYFAST": lighten($green, 4%), "
   justify-content: center
   flex-wrap: wrap
   margin-top: 2rem
-
-@each $tempo, $colour in $tempos
-  .tempo__#{$tempo}
-    color: $colour
 
 @media (max-width: 700px)
   .result
