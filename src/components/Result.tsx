@@ -23,7 +23,21 @@ interface OnClickEvent extends ReactMousEvent<HTMLDivElement> {
   target: HTMLElement;
 }
 
-export default function Result({ compact, added_at, added_by, track, updater, showModal, setShowModal }: Props) {
+export default function Result({
+  compact,
+  added_at,
+  added_by = {
+    id: "you",
+    href: "https://api.spotify.com/v1/me",
+    type: "user",
+    uri: "spotify:user:me",
+    external_urls: { spotify: "https://open.spotify.com" },
+  },
+  track,
+  updater,
+  showModal,
+  setShowModal,
+}: Props) {
   const [features, setFeatures] = useState<SpotifyApi.AudioFeaturesObject>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
