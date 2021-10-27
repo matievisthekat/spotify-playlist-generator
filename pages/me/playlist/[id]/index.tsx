@@ -5,11 +5,11 @@ import Updater from "spotify-oauth-refresher";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
+import SkeletonTrack from "../../../../src/components/SkeletonTrack";
 import { CredProps, getCreds, requireLogin } from "../../../../src/util";
+import { getAllPlaylistTracks } from "../../../../src/getPlaylistTracks";
 import LikedSongs from "../../../../public/liked.png";
 import styles from "../../../../styles/pages/Playlist.module.sass";
-import { getAllPlaylistTracks } from "../../../../src/getPlaylistTracks";
-import SkeletonTrack from "../../../../src/components/SkeletonTrack";
 
 export async function getStaticPaths() {
   return {
@@ -75,7 +75,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.id}</ExternalLink>
         </span>
       )}
-      {pl && <span>{pl.description}</span>}
+      {pl && pl.description && <span>{pl.description}</span>}
       {error && <span className="error">{error}</span>}
       <main>
         <div className={styles.tracks}>
