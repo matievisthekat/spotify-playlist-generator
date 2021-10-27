@@ -6,7 +6,7 @@ import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
-import { CredProps, getCreds, requireLogin } from "../../../../src/util";
+import { CredProps, escapeHex, getCreds, requireLogin } from "../../../../src/util";
 import { getAllPlaylistTracks } from "../../../../src/getPlaylistTracks";
 import LikedSongs from "../../../../public/liked.png";
 import styles from "../../../../styles/pages/Playlist.module.sass";
@@ -75,7 +75,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.id}</ExternalLink>
         </span>
       )}
-      {pl && pl.description && <span>{pl.description}</span>}
+      {pl && pl.description && <span>{escapeHex(pl.description)}</span>}
       {error && <span className="error">{error}</span>}
       <main>
         <div className={styles.tracks}>
