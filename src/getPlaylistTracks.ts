@@ -26,6 +26,7 @@ export const getPageOfPlaylistTracks = (updater: Updater, id: string, limit: num
     }
   });
 };
+
 export const getAllPlaylistTracks = async (updater: Updater, id: string) => {
   const tracks = [];
   const limit = id === "liked" ? 50 : 100;
