@@ -1,8 +1,5 @@
 import Updater from "spotify-oauth-refresher";
 
-let allOffset = 0;
-let continueAllLoop = true;
-
 export const getPageOfPlaylistTracks = (updater: Updater, id: string, limit: number, offset: number) => {
   return new Promise<SpotifyApi.PlaylistTrackResponse | SpotifyApi.UsersSavedTracksResponse>((resolve, reject) => {
     if (id === "liked") {
@@ -28,6 +25,9 @@ export const getPageOfPlaylistTracks = (updater: Updater, id: string, limit: num
 };
 
 export const getAllPlaylistTracks = async (updater: Updater, id: string) => {
+  let allOffset = 0;
+  let continueAllLoop = true;
+
   const tracks = [];
   const limit = id === "liked" ? 50 : 100;
 
