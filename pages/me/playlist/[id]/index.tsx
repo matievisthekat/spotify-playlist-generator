@@ -1,14 +1,13 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
-import { nanoid } from "nanoid";
 import Updater from "spotify-oauth-refresher";
-import InfiniteScroll from "react-infinite-scroller";
-import { ScaleLoader } from "react-spinners";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
-import { CredProps, getCreds, requireLogin } from "../../../../src/util";
+import SkeletonTrack from "../../../../src/components/SkeletonTrack";
+import { CredProps, escapeHex, getCreds, requireLogin } from "../../../../src/util";
+import { getAllPlaylistTracks } from "../../../../src/getPlaylistTracks";
 import LikedSongs from "../../../../public/liked.png";
 import styles from "../../../../styles/pages/Playlist.module.sass";
 
@@ -28,47 +27,13 @@ export async function getStaticProps() {
 export default function Playlist({ clientId, clientSecret, authUrl }: CredProps) {
   const updater = new Updater({ clientId, clientSecret });
   const [pl, setPl] = useState<SpotifyApi.SinglePlaylistResponse>();
-  const [tracks, setTracks] = useState<SpotifyApi.PlaylistTrackObject[]>();
-  const [likedSongs, setLikedSongs] = useState<SpotifyApi.SavedTrackObject[]>();
+  const [tracks, setTracks] = useState<SpotifyApi.PlaylistTrackObject[] | SpotifyApi.SavedTrackObject[]>();
   const [modal, setModal] = useState(-1);
   const [loading, setLoading] = useState(true);
-  const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
-  const { id } = router.query;
+  const id = router.query.id as string;
   const liked = id === "liked";
-
-  const getTracks = (offset: number) => {
-    if (liked) {
-      updater
-        .request<SpotifyApi.UsersSavedTracksResponse>({
-          url: "https://api.spotify.com/v1/me/tracks",
-          params: { offset, limit: 50 },
-          authType: "bearer",
-        })
-        .then(({ data }) => {
-          if (data.items.length <= 0) setHasMore(false);
-          if (offset !== 0 && likedSongs && data.items.length > 0) setLikedSongs([...likedSongs, ...data.items]);
-          else setLikedSongs(data.items);
-        })
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
-    } else {
-      updater
-        .request<SpotifyApi.PlaylistTrackResponse>({
-          url: `https://api.spotify.com/v1/playlists/${id}/tracks`,
-          params: { offset, limit: 50 },
-          authType: "bearer",
-        })
-        .then(({ data }) => {
-          if (data.items.length <= 0) setHasMore(false);
-          if (offset !== 0 && tracks && data.items.length > 0) setTracks([...tracks, ...data.items]);
-          else if (data.items.length > 0) setTracks(data.items);
-        })
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
-    }
-  };
 
   useEffect(() => {
     requireLogin(updater, authUrl);
@@ -79,16 +44,15 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           url: `https://api.spotify.com/v1/playlists/${id}`,
           authType: "bearer",
         })
-        .then(({ data }) => {
-          setPl(data);
-          getTracks(0);
-        })
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
-    } else getTracks(0);
-  }, []);
+        .then(({ data }) => setPl(data))
+        .catch((err) => setError(err.message));
+    }
 
-  const loadMore = (page: number) => getTracks(50 * page);
+    getAllPlaylistTracks(updater, id)
+      .then((tracks) => setTracks(tracks))
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <div className="container">
@@ -103,68 +67,31 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         </span>
       )}
       <h2>
-        {loading
-          ? `Fetching playist ${id}...`
-          : likedSongs
-          ? "Liked Songs"
-          : pl
-          ? pl.name
-          : `Failed to fetch playlist ${id}`}
-        <GenerateButton href={`/me/playlist/${liked ? "liked" : id}/generate`} />
+        {loading ? `Fetching playist '${id}'...` : liked ? "Liked Songs" : pl ? pl.name : `Unknown`}
+        <GenerateButton href={`/me/playlist/${id}/generate`} />
       </h2>
       {pl && (
         <span className={styles.credits}>
           Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.id}</ExternalLink>
         </span>
       )}
-      {pl && <span>{pl.description}</span>}
+      {pl && pl.description && <span>{escapeHex(pl.description)}</span>}
       {error && <span className="error">{error}</span>}
       <main>
-        {(tracks || likedSongs) && (
-          <div className={styles.tracks}>
-            <InfiniteScroll
-              pageStart={0}
-              loadMore={loadMore}
-              initialLoad={false}
-              hasMore={hasMore}
-              loader={
-                <div style={{ textAlign: "center" }} key={nanoid()}>
-                  <ScaleLoader loading={hasMore} color="#1DB954" />
-                </div>
-              }
-            >
-              {tracks &&
-                tracks.map((t, i) => (
-                  <Result
-                    {...t}
-                    setShowModal={(v: boolean) => setModal(v ? i : -1)}
-                    showModal={modal === i}
-                    updater={updater}
-                    key={i}
-                    compact
-                  />
-                ))}
-              {likedSongs &&
-                likedSongs.map((t, i) => (
-                  <Result
-                    {...t}
-                    added_by={{
-                      id: "you",
-                      href: "https://api.spotify.com/v1/me",
-                      type: "user",
-                      uri: "spotify:user:me",
-                      external_urls: { spotify: "https://open.spotify.com" },
-                    }}
-                    setShowModal={(v: boolean) => setModal(v ? i : -1)}
-                    showModal={modal === i}
-                    updater={updater}
-                    key={i}
-                    compact
-                  />
-                ))}
-            </InfiniteScroll>
-          </div>
-        )}
+        <div className={styles.tracks}>
+          {tracks
+            ? tracks.map((t, i) => (
+                <Result
+                  {...t}
+                  setShowModal={(v: boolean) => setModal(v ? i : -1)}
+                  showModal={modal === i}
+                  updater={updater}
+                  key={i}
+                  compact
+                />
+              ))
+            : new Array(10).fill(null).map((_, i) => <SkeletonTrack key={i} />)}
+        </div>
       </main>
     </div>
   );

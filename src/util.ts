@@ -1,5 +1,11 @@
 import Updater from "spotify-oauth-refresher";
 
+export const escapeHex = (s: string) => {
+  const regex = /&#x([a-fA-F0-9]+);/g;
+  const escaped = s.replace(regex, (match, group) => String.fromCharCode(parseInt(group, 16)));
+  return escaped;
+};
+
 export const removeEl = (arr: string[], item: string) => {
   const newArr = new Array(...arr);
   const index = newArr.indexOf(item);
