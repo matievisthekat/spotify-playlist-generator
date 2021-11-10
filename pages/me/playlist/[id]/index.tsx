@@ -82,11 +82,6 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       )}
       {pl && pl.description && <span>{escapeHex(pl.description)}</span>}
       {error && <span className="error">{error}</span>}
-      {pl && (
-        <span>
-          {tracks.length}/{pl.tracks.total}
-        </span>
-      )}
       <main>
         <div className={styles.tracks}>
           {tracks.length === pl?.tracks.total ? (
