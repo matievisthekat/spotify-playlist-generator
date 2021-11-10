@@ -72,7 +72,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       </h2>
       {pl && (
         <span className={styles.credits}>
-          Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.id}</ExternalLink>
+          Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.display_name}</ExternalLink>
         </span>
       )}
       {pl && pl.description && <span>{escapeHex(pl.description)}</span>}

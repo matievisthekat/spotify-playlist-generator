@@ -1,4 +1,4 @@
-import { useState, MouseEvent as ReactMousEvent } from "react";
+import { useState, MouseEvent as ReactMousEvent, useEffect } from "react";
 import { ScaleLoader } from "react-spinners";
 import Updater from "spotify-oauth-refresher";
 import { nanoid } from "nanoid";
@@ -38,6 +38,9 @@ export default function Result({
   showModal,
   setShowModal,
 }: Props) {
+  const [displayName, setDisplayName] = useState(
+    added_by.id === "you" ? "You" : added_by.id === "spotify" ? "Spotify" : "[loading]"
+  );
   const [features, setFeatures] = useState<SpotifyApi.AudioFeaturesObject>();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -72,13 +75,26 @@ export default function Result({
     document.querySelector("body")?.classList.remove("noscroll");
   };
 
-  if (added_by?.uri === "spotify:user:") {
+  if (added_by.uri === "spotify:user:") {
     added_by = Object.assign(added_by, {
       id: "spotify",
       external_urls: { spotify: "https://open.spotify.com/user/spotify" },
       uri: "spotify:user:spotify",
     });
   }
+
+  useEffect(() => {
+    if (added_by.uri !== "spotify:user:me" && added_by.uri !== "spotify:user:spotify") {
+      updater
+        .request<SpotifyApi.UserObjectPublic>({
+          method: "GET",
+          url: added_by.href,
+          authType: "bearer",
+        })
+        .then(({ data }) => setDisplayName(data.display_name || "unknown"))
+        .catch(() => setDisplayName("unknown"));
+    }
+  }, []);
 
   return (
     <>
@@ -125,8 +141,8 @@ export default function Result({
             <small>
               {moment(added_at).fromNow()}
               &nbsp;<strong>-</strong>&nbsp;
-              <a href={added_by?.external_urls.spotify} className={styles.link} target="_blank" rel="noreferrer">
-                {added_by?.display_name || added_by?.id}
+              <a href={added_by.external_urls.spotify} className={styles.link} target="_blank" rel="noreferrer">
+                {displayName}
               </a>
             </small>
           </span>
