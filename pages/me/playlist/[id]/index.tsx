@@ -72,7 +72,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         </span>
       )}
       <h2>
-        {loading ? `Fetching playist '${id}'...` : liked ? "Liked Songs" : pl ? pl.name : `Unknown`}
+        {loading ? `Fetching playlist '${id}'...` : liked ? "Liked Songs" : pl ? pl.name : `Unknown`}
         <GenerateButton href={`/me/playlist/${id}/generate`} />
       </h2>
       {pl && (
