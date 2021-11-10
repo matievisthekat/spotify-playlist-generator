@@ -2,6 +2,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
+import InfiniteScroll from "react-infinite-scroller";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
@@ -27,7 +28,8 @@ export async function getStaticProps() {
 export default function Playlist({ clientId, clientSecret, authUrl }: CredProps) {
   const updater = new Updater({ clientId, clientSecret });
   const [pl, setPl] = useState<SpotifyApi.SinglePlaylistResponse>();
-  const [tracks, setTracks] = useState<SpotifyApi.PlaylistTrackObject[] | SpotifyApi.SavedTrackObject[]>();
+  const [tracks, setTracks] = useState<SpotifyApi.PlaylistTrackObject[] | SpotifyApi.SavedTrackObject[]>([]);
+  const [shownTracks, setShownTracks] = useState<SpotifyApi.PlaylistTrackObject[] | SpotifyApi.SavedTrackObject[]>([]);
   const [modal, setModal] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -49,7 +51,10 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
     }
 
     getAllPlaylistTracks(updater, id)
-      .then((tracks) => setTracks(tracks))
+      .then((tracks) => {
+        setTracks(tracks);
+        setShownTracks(tracks.slice(0, 50));
+      })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
@@ -77,10 +82,32 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       )}
       {pl && pl.description && <span>{escapeHex(pl.description)}</span>}
       {error && <span className="error">{error}</span>}
+      {pl && (
+        <span>
+          {tracks.length}/{pl.tracks.total}
+        </span>
+      )}
       <main>
         <div className={styles.tracks}>
-          {tracks
-            ? tracks.map((t, i) => (
+          {tracks.length === pl?.tracks.total ? (
+            /*
+            You may be wondering why im still scroll-loading the tracks when i spent
+            a lot of time making it possible to get all the tracks at once. Well
+            rendering 800+ tracks litterally crashes the browser. So having all the tracks
+            in memory makes sorting possible while still being useable.
+
+            thank you for coming to my ted talk
+            */
+            <InfiniteScroll
+              pageStart={0}
+              hasMore={shownTracks.length < tracks.length}
+              loadMore={(page) => {
+                if (page > 1) {
+                  setShownTracks([...shownTracks, ...tracks.slice(shownTracks.length - 1, shownTracks.length + 49)]);
+                }
+              }}
+            >
+              {shownTracks.map((t, i) => (
                 <Result
                   {...t}
                   setShowModal={(v: boolean) => setModal(v ? i : -1)}
@@ -89,8 +116,11 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
                   key={i}
                   compact
                 />
-              ))
-            : new Array(10).fill(null).map((_, i) => <SkeletonTrack key={i} />)}
+              ))}
+            </InfiniteScroll>
+          ) : (
+            new Array(10).fill(null).map((_, i) => <SkeletonTrack key={i} />)
+          )}
         </div>
       </main>
     </div>
