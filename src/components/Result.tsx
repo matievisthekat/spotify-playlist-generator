@@ -55,7 +55,6 @@ export default function Result({
 
     setShowModal(true);
     document.querySelector("body")?.classList.add("noscroll");
-    console.log(features);
   };
 
   const close = () => {
