@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
@@ -9,7 +8,6 @@ import GenerateButton from "../../../../src/components/GenerateButton";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
 import { CredProps, escapeHex, getCreds, requireLogin } from "../../../../src/util";
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
-import LikedSongs from "../../../../public/liked.png";
 import styles from "../../../../styles/pages/Playlist.module.sass";
 
 export async function getStaticPaths() {
