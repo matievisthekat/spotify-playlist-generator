@@ -1,10 +1,14 @@
 import Updater from "spotify-oauth-refresher";
 
+export interface PlaylistTrack extends SpotifyApi.PlaylistTrackObject {
+  features: SpotifyApi.AudioFeaturesObject;
+}
+
 export const getPageOfPlaylistTracks = (updater: Updater, id: string, limit: number, offset: number) => {
-  return new Promise<SpotifyApi.PlaylistTrackResponse | SpotifyApi.UsersSavedTracksResponse>((resolve, reject) => {
+  return new Promise<SpotifyApi.PlaylistTrackResponse>((resolve, reject) => {
     if (id === "liked") {
       updater
-        .request<SpotifyApi.UsersSavedTracksResponse>({
+        .request<SpotifyApi.PlaylistTrackResponse>({
           url: "https://api.spotify.com/v1/me/tracks",
           params: { offset, limit: Math.min(limit, 50) }, // The Math.min() here makes sure the limit for liked songs does not excede 50
           authType: "bearer",
@@ -28,15 +32,23 @@ export const getAllPlaylistTracks = async (updater: Updater, id: string) => {
   let allOffset = 0;
   let continueAllLoop = true;
 
-  const tracks = [];
+  const tracks: PlaylistTrack[] = [];
   const limit = id === "liked" ? 50 : 100;
 
   do {
     const page = await getPageOfPlaylistTracks(updater, id, limit, allOffset);
+    const features = await updater.request<{ audio_features: SpotifyApi.AudioFeaturesObject[] }>({
+      method: "GET",
+      url: "https://api.spotify.com/v1/audio-features",
+      params: { ids: page.items.map((item) => item.track.id).join(",") },
+      authType: "bearer",
+    });
 
     if (page.items.length > 0) {
       allOffset += limit;
-      tracks.push(...page.items);
+      page.items.forEach((item, i) => {
+        tracks.push({ ...item, features: features.data.audio_features[i] });
+      });
     } else continueAllLoop = false;
   } while (continueAllLoop);
 

@@ -8,7 +8,7 @@ import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
 import { CredProps, escapeHex, getCreds, requireLogin } from "../../../../src/util";
-import { getAllPlaylistTracks } from "../../../../src/getPlaylistTracks";
+import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import LikedSongs from "../../../../public/liked.png";
 import styles from "../../../../styles/pages/Playlist.module.sass";
 
@@ -28,8 +28,8 @@ export async function getStaticProps() {
 export default function Playlist({ clientId, clientSecret, authUrl }: CredProps) {
   const updater = new Updater({ clientId, clientSecret });
   const [pl, setPl] = useState<SpotifyApi.SinglePlaylistResponse>();
-  const [tracks, setTracks] = useState<SpotifyApi.PlaylistTrackObject[] | SpotifyApi.SavedTrackObject[]>([]);
-  const [shownTracks, setShownTracks] = useState<SpotifyApi.PlaylistTrackObject[] | SpotifyApi.SavedTrackObject[]>([]);
+  const [tracks, setTracks] = useState<PlaylistTrack[]>([]);
+  const [shownTracks, setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -102,16 +102,19 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
                 }
               }}
             >
-              {shownTracks.map((t, i) => (
-                <Result
-                  {...t}
-                  setShowModal={(v: boolean) => setModal(v ? i : -1)}
-                  showModal={modal === i}
-                  updater={updater}
-                  key={i}
-                  compact
-                />
-              ))}
+              {shownTracks.map((t, i) => {
+                console.log(t);
+                return (
+                  <Result
+                    {...t}
+                    setShowModal={(v: boolean) => setModal(v ? i : -1)}
+                    showModal={modal === i}
+                    updater={updater}
+                    key={i}
+                    compact
+                  />
+                );
+              })}
             </InfiniteScroll>
           ) : (
             new Array(10).fill(null).map((_, i) => <SkeletonTrack key={i} />)

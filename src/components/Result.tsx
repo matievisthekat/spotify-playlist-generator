@@ -12,6 +12,7 @@ import styles from "../../styles/components/Result.module.sass";
 interface Props extends Omit<SpotifyApi.PlaylistTrackObject, "is_local" | "added_by" | "added_at"> {
   showModal: boolean;
   setShowModal(v: boolean): void;
+  features: SpotifyApi.AudioFeaturesObject;
   updater: Updater;
   added_at?: string;
   added_by?: SpotifyApi.UserObjectPublic;
@@ -37,14 +38,12 @@ export default function Result({
   updater,
   showModal,
   setShowModal,
+  features,
 }: Props) {
   const [displayName, setDisplayName] = useState(
     added_by.id === "you" ? "You" : added_by.id === "spotify" ? "Spotify" : "[loading]"
   );
-  const [features, setFeatures] = useState<SpotifyApi.AudioFeaturesObject>();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
+  
   const open = (e: OnClickEvent) => {
     if (
       !e.target.classList.contains(styles.result) &&
@@ -56,18 +55,7 @@ export default function Result({
 
     setShowModal(true);
     document.querySelector("body")?.classList.add("noscroll");
-
-    if (!features) {
-      setLoading(true);
-      updater
-        .request({
-          url: `https://api.spotify.com/v1/audio-features/${track.id}`,
-          authType: "bearer",
-        })
-        .then(({ data }) => setFeatures(data))
-        .catch((err) => setError(err.message))
-        .finally(() => setLoading(false));
-    }
+    console.log(features);
   };
 
   const close = () => {
@@ -100,12 +88,7 @@ export default function Result({
     <>
       <Modal show={showModal} close={close}>
         <h4>{track.name}</h4>
-        {error && <span className="error">{error}</span>}
-        {loading ? (
-          <span className={styles.loader}>
-            <ScaleLoader loading={loading} color="#1DB954" />
-          </span>
-        ) : features ? (
+        {features && (
           <div className={styles.features}>
             {Object.entries(categories).map((f, i) => {
               const info = categories[f[0] as CategoryName];
@@ -127,7 +110,7 @@ export default function Result({
               }
             })}
           </div>
-        ) : null}
+        )}
       </Modal>
       <div className={`${styles.result} ${compact ? styles.compact : styles.normal}`} onClick={open}>
         <img
