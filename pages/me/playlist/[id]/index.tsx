@@ -48,6 +48,57 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         })
         .then(({ data }) => setPl(data))
         .catch((err) => setError(err.message));
+    } else {
+      updater
+        .request<SpotifyApi.UsersSavedTracksResponse>({
+          url: `https://api.spotify.com/v1/me/tracks`,
+          authType: "bearer",
+        })
+        .then(({ data }) =>
+          setPl({
+            name: "Liked Songs",
+            followers: {
+              href: null,
+              total: 0,
+            },
+            tracks: {
+              href: "",
+              total: data.total,
+              limit: 50,
+              next: null,
+              previous: null,
+              items: [],
+              offset: 0,
+            },
+            collaborative: false,
+            description: "",
+            id: "",
+            images: [
+              {
+                url: "/liked.png",
+              },
+            ],
+            owner: {
+              uri: "https://open.spotify.com",
+              id: "",
+              display_name: "you",
+              external_urls: {
+                spotify: "https://open.spotify.com",
+              },
+              href: "",
+              type: "user",
+            },
+            public: false,
+            snapshot_id: "",
+            type: "playlist",
+            href: "",
+            external_urls: {
+              spotify: "https://open.spotify.com/collection/tracks",
+            },
+            uri: "",
+          })
+        )
+        .catch((err) => setError(err.message));
     }
 
     getAllPlaylistTracks(updater, id)
@@ -64,11 +115,6 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       {pl && (
         <span className={styles.cover}>
           <img src={pl.images[0].url} width={200} height={200} alt="Playlist cover image" />
-        </span>
-      )}
-      {liked && (
-        <span className={styles.cover}>
-          <Image src={LikedSongs} width={200} height={200} alt="Liked songs cover" />
         </span>
       )}
       <h2>
@@ -102,19 +148,16 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
                 }
               }}
             >
-              {shownTracks.map((t, i) => {
-                console.log(t);
-                return (
-                  <Result
-                    {...t}
-                    setShowModal={(v: boolean) => setModal(v ? i : -1)}
-                    showModal={modal === i}
-                    updater={updater}
-                    key={i}
-                    compact
-                  />
-                );
-              })}
+              {shownTracks.map((t, i) => (
+                <Result
+                  {...t}
+                  setShowModal={(v: boolean) => setModal(v ? i : -1)}
+                  showModal={modal === i}
+                  updater={updater}
+                  key={i}
+                  compact
+                />
+              ))}
             </InfiniteScroll>
           ) : (
             new Array(10).fill(null).map((_, i) => <SkeletonTrack key={i} />)
