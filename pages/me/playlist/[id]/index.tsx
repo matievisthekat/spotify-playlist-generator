@@ -70,7 +70,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
             },
             collaborative: false,
             description: "",
-            id: "",
+            id: "liked",
             images: [
               {
                 url: "/liked.png",
