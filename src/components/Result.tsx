@@ -1,5 +1,4 @@
 import { useState, MouseEvent as ReactMousEvent, useEffect } from "react";
-import { ScaleLoader } from "react-spinners";
 import Updater from "spotify-oauth-refresher";
 import { nanoid } from "nanoid";
 import moment from "moment";
