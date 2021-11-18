@@ -11,7 +11,7 @@ import styles from "../../styles/components/Result.module.sass";
 interface Props extends Omit<SpotifyApi.PlaylistTrackObject, "is_local" | "added_by" | "added_at"> {
   showModal: boolean;
   setShowModal(v: boolean): void;
-  features: SpotifyApi.AudioFeaturesObject;
+  features?: SpotifyApi.AudioFeaturesObject;
   updater: Updater;
   added_at?: string;
   added_by?: SpotifyApi.UserObjectPublic;
