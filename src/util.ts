@@ -1,13 +1,13 @@
 import Updater from "spotify-oauth-refresher";
 import { PlaylistTrack } from "./getPlaylistTracks";
 
-export function sort(order: "asc" | "desc", sort: Sort, array: PlaylistTrack[]) {
+export function sortTracks(order: "asc" | "desc", sort: Sort, array: PlaylistTrack[]) {
   const desc = order === "desc";
 
   return array.sort((a, b) => {
     switch (sort) {
       case "default":
-        return 0;
+        return desc ? -1 : 1;
 
       case "name":
         return desc ? b.track.name.localeCompare(a.track.name) : a.track.name.localeCompare(b.track.name);
