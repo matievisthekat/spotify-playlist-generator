@@ -29,6 +29,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   const [tracks, setTracks] = useState<PlaylistTrack[]>([]);
   const [shownTracks, setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
+  const [descending, setDescending] = useState(true);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -125,6 +126,21 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         </span>
       )}
       {pl && pl.description && <span>{escapeHex(pl.description)}</span>}
+      <span>
+        <select>
+          <option value="name">Name</option>
+          <option value="album">Album</option>
+          <option value="artist">Artist</option>
+          <option value="added-at">Added at</option>
+          <option value="duration">Duration</option>
+        </select>
+      </span>
+      <span>
+        <select onChange={(e) => setDescending(e.target.value === "desc")} value={descending ? "desc" : "asc"}>
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </span>
       {error && <span className="error">{error}</span>}
       <main>
         <div className={styles.tracks}>
