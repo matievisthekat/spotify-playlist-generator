@@ -76,6 +76,7 @@ export const scope = [
 ];
 
 export type Sort = "default" | "name" | "album" | "artist" | "added-at" | "duration";
+export type SortOrder = "asc" | "desc";
 
 export interface CredProps {
   clientId: string;
