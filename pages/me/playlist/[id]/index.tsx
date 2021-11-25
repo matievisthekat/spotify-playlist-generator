@@ -10,6 +10,8 @@ import { CredProps, escapeHex, getCreds, requireLogin } from "../../../../src/ut
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import styles from "../../../../styles/pages/Playlist.module.sass";
 
+type Sort = "default" | "name" | "album" | "artist" | "added-at" | "duration";
+
 export async function getStaticPaths() {
   return {
     paths: [],
@@ -30,6 +32,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   const [shownTracks, setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
   const [descending, setDescending] = useState(true);
+  const [sort, setSort] = useState<Sort>("default");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -127,7 +130,8 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       )}
       {pl && pl.description && <span>{escapeHex(pl.description)}</span>}
       <span>
-        <select>
+        <select onChange={(e) => setSort(e.target.value as Sort)} value={sort}>
+          <option value="default">Default</option>
           <option value="name">Name</option>
           <option value="album">Album</option>
           <option value="artist">Artist</option>
