@@ -6,7 +6,7 @@ import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
-import { CredProps, escapeHex, getCreds, requireLogin } from "../../../../src/util";
+import { CredProps, escapeHex, getCreds, requireLogin, Sort, sortTracks, SortOrder } from "../../../../src/util";
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import styles from "../../../../styles/pages/Playlist.module.sass";
 
@@ -26,14 +26,19 @@ export async function getStaticProps() {
 export default function Playlist({ clientId, clientSecret, authUrl }: CredProps) {
   const updater = new Updater({ clientId, clientSecret });
   const [pl, setPl] = useState<SpotifyApi.SinglePlaylistResponse>();
-  const [tracks, setTracks] = useState<PlaylistTrack[]>([]);
-  const [shownTracks, setShownTracks] = useState<PlaylistTrack[]>([]);
+  const [tracks, _setTracks] = useState<PlaylistTrack[]>([]);
+  const [shownTracks, _setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
+  const [sort, setSort] = useState<Sort>("default");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
   const id = router.query.id as string;
   const liked = id === "liked";
+
+  const setShownTracks = (tracks: PlaylistTrack[]) => _setShownTracks(sortTracks(sortOrder, sort, tracks));
+  const setTracks = (tracks: PlaylistTrack[]) => _setTracks(sortTracks(sortOrder, sort, tracks));
 
   useEffect(() => {
     requireLogin(updater, authUrl);
@@ -108,6 +113,13 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (tracks.length === pl?.tracks.total) {
+      setTracks(tracks);
+      setShownTracks(tracks.slice(0, 50));
+    }
+  }, [sort, sortOrder]);
+
   return (
     <div className="container">
       {pl && (
@@ -125,6 +137,22 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         </span>
       )}
       {pl && pl.description && <span>{escapeHex(pl.description)}</span>}
+      <span>
+        <select onChange={(e) => setSort(e.target.value as Sort)} value={sort}>
+          <option value="default">Default</option>
+          <option value="name">Name</option>
+          <option value="album">Album</option>
+          <option value="artist">Artist</option>
+          <option value="added-at">Added at</option>
+          <option value="duration">Duration</option>
+        </select>
+      </span>
+      <span>
+        <select onChange={(e) => setSortOrder(e.target.value as SortOrder)} value={sortOrder}>
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
+        </select>
+      </span>
       {error && <span className="error">{error}</span>}
       <main>
         <div className={styles.tracks}>
