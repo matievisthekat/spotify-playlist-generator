@@ -1,4 +1,39 @@
 import Updater from "spotify-oauth-refresher";
+import { PlaylistTrack } from "./getPlaylistTracks";
+
+export function sort(order: "asc" | "desc", array: PlaylistTrack[]) {
+  const desc = order === "desc";
+
+  return function (sort: Sort) {
+    return array.sort((a, b) => {
+      switch (sort) {
+        case "default":
+          return 0;
+
+        case "name":
+          return desc ? b.track.name.localeCompare(a.track.name) : a.track.name.localeCompare(b.track.name);
+
+        case "album":
+          return desc
+            ? b.track.album.name.localeCompare(a.track.album.name)
+            : a.track.album.name.localeCompare(b.track.album.name);
+
+        case "artist":
+          return desc
+            ? b.track.artists[0].name.localeCompare(a.track.artists[0].name)
+            : a.track.artists[0].name.localeCompare(b.track.artists[0].name);
+
+        case "added-at":
+          return desc
+            ? new Date(b.added_at).getTime() - new Date(a.added_at).getTime()
+            : new Date(a.added_at).getTime() - new Date(b.added_at).getTime();
+
+        case "duration":
+          return desc ? b.track.duration_ms - a.track.duration_ms : a.track.duration_ms - b.track.duration_ms;
+      }
+    });
+  };
+}
 
 export const escapeHex = (s: string) => {
   const regex = /&#x([a-fA-F0-9]+);/g;
@@ -39,6 +74,8 @@ export const scope = [
   "playlist-modify-private",
   "user-library-read",
 ];
+
+export type Sort = "default" | "name" | "album" | "artist" | "added-at" | "duration";
 
 export interface CredProps {
   clientId: string;

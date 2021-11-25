@@ -6,11 +6,9 @@ import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
-import { CredProps, escapeHex, getCreds, requireLogin } from "../../../../src/util";
+import { CredProps, escapeHex, getCreds, requireLogin, Sort } from "../../../../src/util";
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import styles from "../../../../styles/pages/Playlist.module.sass";
-
-type Sort = "default" | "name" | "album" | "artist" | "added-at" | "duration";
 
 export async function getStaticPaths() {
   return {
@@ -31,7 +29,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   const [tracks, setTracks] = useState<PlaylistTrack[]>([]);
   const [shownTracks, setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
-  const [descending, setDescending] = useState(true);
+  const [descending, setDescending] = useState(false);
   const [sort, setSort] = useState<Sort>("default");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
