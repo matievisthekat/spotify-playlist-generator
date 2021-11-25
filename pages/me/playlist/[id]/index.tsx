@@ -6,7 +6,7 @@ import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
-import { CredProps, escapeHex, getCreds, requireLogin, Sort, sort, SortOrder } from "../../../../src/util";
+import { CredProps, escapeHex, getCreds, requireLogin, Sort, sortTracks, SortOrder } from "../../../../src/util";
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import styles from "../../../../styles/pages/Playlist.module.sass";
 
@@ -26,8 +26,8 @@ export async function getStaticProps() {
 export default function Playlist({ clientId, clientSecret, authUrl }: CredProps) {
   const updater = new Updater({ clientId, clientSecret });
   const [pl, setPl] = useState<SpotifyApi.SinglePlaylistResponse>();
-  const [tracks, setTracks] = useState<PlaylistTrack[]>([]);
-  const [shownTracks, setShownTracks] = useState<PlaylistTrack[]>([]);
+  const [tracks, _setTracks] = useState<PlaylistTrack[]>([]);
+  const [shownTracks, _setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [sort, setSort] = useState<Sort>("default");
@@ -36,6 +36,9 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   const router = useRouter();
   const id = router.query.id as string;
   const liked = id === "liked";
+
+  const setShownTracks = (tracks: PlaylistTrack[]) => _setShownTracks(sortTracks(sortOrder, sort, tracks));
+  const setTracks = (tracks: PlaylistTrack[]) => _setTracks(sortTracks(sortOrder, sort, tracks));
 
   useEffect(() => {
     requireLogin(updater, authUrl);
@@ -109,6 +112,13 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (tracks.length === pl?.tracks.total) {
+      setTracks(tracks);
+      setShownTracks(tracks.slice(0, 50));
+    }
+  }, [sort, sortOrder]);
 
   return (
     <div className="container">
