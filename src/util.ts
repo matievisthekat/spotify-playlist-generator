@@ -1,38 +1,36 @@
 import Updater from "spotify-oauth-refresher";
 import { PlaylistTrack } from "./getPlaylistTracks";
 
-export function sort(order: "asc" | "desc", array: PlaylistTrack[]) {
+export function sort(order: "asc" | "desc", sort: Sort, array: PlaylistTrack[]) {
   const desc = order === "desc";
 
-  return function (sort: Sort) {
-    return array.sort((a, b) => {
-      switch (sort) {
-        case "default":
-          return 0;
+  return array.sort((a, b) => {
+    switch (sort) {
+      case "default":
+        return 0;
 
-        case "name":
-          return desc ? b.track.name.localeCompare(a.track.name) : a.track.name.localeCompare(b.track.name);
+      case "name":
+        return desc ? b.track.name.localeCompare(a.track.name) : a.track.name.localeCompare(b.track.name);
 
-        case "album":
-          return desc
-            ? b.track.album.name.localeCompare(a.track.album.name)
-            : a.track.album.name.localeCompare(b.track.album.name);
+      case "album":
+        return desc
+          ? b.track.album.name.localeCompare(a.track.album.name)
+          : a.track.album.name.localeCompare(b.track.album.name);
 
-        case "artist":
-          return desc
-            ? b.track.artists[0].name.localeCompare(a.track.artists[0].name)
-            : a.track.artists[0].name.localeCompare(b.track.artists[0].name);
+      case "artist":
+        return desc
+          ? b.track.artists[0].name.localeCompare(a.track.artists[0].name)
+          : a.track.artists[0].name.localeCompare(b.track.artists[0].name);
 
-        case "added-at":
-          return desc
-            ? new Date(b.added_at).getTime() - new Date(a.added_at).getTime()
-            : new Date(a.added_at).getTime() - new Date(b.added_at).getTime();
+      case "added-at":
+        return desc
+          ? new Date(b.added_at).getTime() - new Date(a.added_at).getTime()
+          : new Date(a.added_at).getTime() - new Date(b.added_at).getTime();
 
-        case "duration":
-          return desc ? b.track.duration_ms - a.track.duration_ms : a.track.duration_ms - b.track.duration_ms;
-      }
-    });
-  };
+      case "duration":
+        return desc ? b.track.duration_ms - a.track.duration_ms : a.track.duration_ms - b.track.duration_ms;
+    }
+  });
 }
 
 export const escapeHex = (s: string) => {
