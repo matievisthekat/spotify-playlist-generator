@@ -9,6 +9,7 @@ import SkeletonTrack from "../../../../src/components/SkeletonTrack";
 import { CredProps, escapeHex, getCreds, requireLogin, Sort, sortTracks, SortOrder } from "../../../../src/util";
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import styles from "../../../../styles/pages/Playlist.module.sass";
+import FeatureDisplay from "../../../../src/components/FeatureDisplay";
 
 export async function getStaticPaths() {
   return {
@@ -155,6 +156,62 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       </span>
       {error && <span className="error">{error}</span>}
       <main>
+        <div className={styles.average}>
+          {tracks.length === pl?.tracks.total ? (
+            <>
+              <FeatureDisplay
+                displayLike="number"
+                title="Avg. Danceability"
+                value={(tracks.reduce((prev, curr) => (prev += curr.features.danceability), 0) / tracks.length) * 100}
+                infoText="This playlist's average danceability"
+              />
+              <FeatureDisplay
+                displayLike="number"
+                title="Avg. Acouticness"
+                value={(tracks.reduce((prev, curr) => (prev += curr.features.acousticness), 0) / tracks.length) * 100}
+                infoText="This playlist's average acousticness"
+              />
+              <FeatureDisplay
+                displayLike="number"
+                title="Avg. Energy"
+                value={(tracks.reduce((prev, curr) => (prev += curr.features.energy), 0) / tracks.length) * 100}
+                infoText="This playlist's average energy"
+              />
+              <FeatureDisplay
+                displayLike="number"
+                title="Avg. Instrumentalness"
+                value={(tracks.reduce((prev, curr) => (prev += curr.features.instrumentalness), 0) / tracks.length) * 100}
+                infoText="This playlist's average instrumentalness"
+              />
+              <FeatureDisplay
+                displayLike="number"
+                title="Avg. Liveness"
+                value={(tracks.reduce((prev, curr) => (prev += curr.features.liveness), 0) / tracks.length) * 100}
+                infoText="This playlist's average liveness"
+              />
+              <FeatureDisplay
+                displayLike="number"
+                title="Avg. Speechiness"
+                value={(tracks.reduce((prev, curr) => (prev += curr.features.speechiness), 0) / tracks.length) * 100}
+                infoText="This playlist's average speechiness"
+              />
+              <FeatureDisplay
+                displayLike="number"
+                title="Avg. Valence"
+                value={(tracks.reduce((prev, curr) => (prev += curr.features.valence), 0) / tracks.length) * 100}
+                infoText="This playlist's average valence"
+              />
+              <FeatureDisplay
+                displayLike="text"
+                title="Avg. Tempo"
+                text={(tracks.reduce((prev, curr) => (prev += curr.features.tempo), 0) / tracks.length).toFixed(2)}
+                infoText="This playlist's average tempo"
+              />
+            </>
+          ) : (
+            <></>
+          )}
+        </div>
         <div className={styles.tracks}>
           {tracks.length === pl?.tracks.total ? (
             /*
