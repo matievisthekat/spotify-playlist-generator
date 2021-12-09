@@ -10,8 +10,8 @@ export default function GenerateButton({ href }: Props) {
   const router = useRouter();
 
   return (
-    <span className={styles.container} onClick={() => router.push(href)}>
+    <button className={styles.container} onClick={() => router.push(href)}>
       <ArrowForwardIcon />
-    </span>
+    </button>
   );
 }
