@@ -106,6 +106,6 @@ export const categories: Record<CategoryName, string> = {
   speechiness:
     "Speechiness detects the presence of spoken words in a track. The more exclusively speech-like the recording (e.g. talk show, audio book, poetry), the higher the rating",
   valence:
-    "The musical positiveness conveyed by a track. Tracks with high valence sound more positive (e.g. happy, cheerful, euphoric), while tracks with low valence sound more negative (e.g. sad, depressed, angry).",
+    "The musical positiveness conveyed by a track. Tracks with high positivity sound more positive (e.g. happy, cheerful, euphoric), while tracks with low positivity sound more negative (e.g. sad, depressed, angry).",
   tempo: "The overall estimated tempo of a track in beats per minute (BPM)",
 };

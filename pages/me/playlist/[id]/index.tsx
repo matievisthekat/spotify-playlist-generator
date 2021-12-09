@@ -197,9 +197,9 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
               />
               <FeatureDisplay
                 displayLike="number"
-                title="Avg. Valence"
+                title="Avg. Positivity"
                 value={(tracks.reduce((prev, curr) => (prev += curr.features.valence), 0) / tracks.length) * 100}
-                infoText="This playlist's average valence"
+                infoText="This playlist's average positivity"
               />
               <FeatureDisplay
                 displayLike="text"

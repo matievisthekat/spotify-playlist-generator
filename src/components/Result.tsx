@@ -98,7 +98,7 @@ export default function Result({
               } else {
                 return (
                   <FeatureDisplay
-                    title={toProperCase(f[0]).replace(/(iness|ness)$/g, "")}
+                    title={toProperCase(f[0].replace(/valence/gi, "positivity"))}
                     displayLike="number"
                     value={(features[f[0] as CategoryName] as number) * 100}
                     infoText={info}
