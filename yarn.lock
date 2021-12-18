@@ -2976,10 +2976,10 @@ source-map@^0.6.1:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 
-spotify-oauth-refresher@^1.0.4:
-  version "1.0.5"
-  resolved "https://registry.yarnpkg.com/spotify-oauth-refresher/-/spotify-oauth-refresher-1.0.5.tgz#b4ed5040ca440ab0a6dfce7d9f8d9b22892845d9"
-  integrity sha512-ZjKZHZb2J4vd5ZbJ/FiYzoPI4aNEqheW/+JxbGbVyykB29+Rc1bY67C4mJm1ooq+WlZl905zdxeBjNXXdWLWig==
+spotify-oauth-refresher@^1.0.6:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/spotify-oauth-refresher/-/spotify-oauth-refresher-1.0.6.tgz#73c5f227244eb119adcb94df60ac834e096c6f4d"
+  integrity sha512-7ShTtW8Nrpa5hq00lIsOOydZs/GeGmPonSuZRdtCM+pl3Cf12XwQ22U2v0DUPOdrXHDezDu7lPdqaYAOkTmCwg==
   dependencies:
     axios "^0.21.3"
     universal-cookie "^4.0.4"
