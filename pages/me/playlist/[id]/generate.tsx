@@ -123,42 +123,49 @@ export default function Generate(props: CredProps) {
             <DoubleSliderInput value={danceability} onChange={setDanceability} min={0} max={100} />
           </div>
         </div>
+
         <div>
           <h5>Acousticness</h5>
           <div>
             <DoubleSliderInput value={acousticness} onChange={setAcousticness} min={0} max={100} />
           </div>
         </div>
+
         <div>
           <h5>Energy</h5>
           <div>
             <DoubleSliderInput value={energy} onChange={setEnergy} min={0} max={100} />
           </div>
         </div>
+
         <div>
           <h5>Instrumentalness</h5>
           <div>
             <DoubleSliderInput value={instrumentalness} onChange={setInstrumentalness} min={0} max={100} />
           </div>
         </div>
+
         <div>
           <h5>Liveness</h5>
           <div>
             <DoubleSliderInput value={liveness} onChange={setLiveness} min={0} max={100} />
           </div>
         </div>
+
         <div>
           <h5>Speechiness</h5>
           <div>
             <DoubleSliderInput value={speechiness} onChange={setSpeechiness} min={0} max={100} />
           </div>
         </div>
+
         <div>
           <h5>Valence</h5>
           <div>
             <DoubleSliderInput value={valence} onChange={setValence} min={0} max={100} />
           </div>
         </div>
+        
         <div>
           <h5>Tempo</h5>
           <div>
