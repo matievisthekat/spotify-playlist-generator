@@ -29,13 +29,20 @@ export async function getStaticProps() {
   };
 }
 
-export default function Generate(creds: CredProps) {
+export default function Generate(props: CredProps) {
   const [pl, setPl] = useState<Playlist>();
   const [loading, setLoading] = useState(false);
-  const [tracks, setTracks] = useState<PlaylistTrack>();
+  const [tracks, setTracks] = useState<PlaylistTrack[]>();
   const [danceability, setDanceability] = useState([0, 100]);
+  const [acousticness, setAcousticness] = useState([0, 100]);
+  const [energy, setEnergy] = useState([0, 100]);
+  const [instrumentalness, setInstrumentalness] = useState([0, 100]);
+  const [liveness, setLiveness] = useState([0, 100]);
+  const [speechiness, setSpeechiness] = useState([0, 100]);
+  const [valence, setValence] = useState([0, 100]);
+  const [tempo, setTempo] = useState([0, 300]);
   const [error, setError] = useState<string>();
-  const updater = new Updater(creds);
+  const updater = new Updater(props);
   const router = useRouter();
   const { id } = router.query;
   const liked = id === "liked";
@@ -114,6 +121,48 @@ export default function Generate(creds: CredProps) {
           <h5>Danceability</h5>
           <div>
             <DoubleSliderInput value={danceability} onChange={setDanceability} min={0} max={100} />
+          </div>
+        </div>
+        <div>
+          <h5>Acousticness</h5>
+          <div>
+            <DoubleSliderInput value={acousticness} onChange={setAcousticness} min={0} max={100} />
+          </div>
+        </div>
+        <div>
+          <h5>Energy</h5>
+          <div>
+            <DoubleSliderInput value={energy} onChange={setEnergy} min={0} max={100} />
+          </div>
+        </div>
+        <div>
+          <h5>Instrumentalness</h5>
+          <div>
+            <DoubleSliderInput value={instrumentalness} onChange={setInstrumentalness} min={0} max={100} />
+          </div>
+        </div>
+        <div>
+          <h5>Liveness</h5>
+          <div>
+            <DoubleSliderInput value={liveness} onChange={setLiveness} min={0} max={100} />
+          </div>
+        </div>
+        <div>
+          <h5>Speechiness</h5>
+          <div>
+            <DoubleSliderInput value={speechiness} onChange={setSpeechiness} min={0} max={100} />
+          </div>
+        </div>
+        <div>
+          <h5>Valence</h5>
+          <div>
+            <DoubleSliderInput value={valence} onChange={setValence} min={0} max={100} />
+          </div>
+        </div>
+        <div>
+          <h5>Tempo</h5>
+          <div>
+            <DoubleSliderInput value={tempo} onChange={setTempo} min={0} max={300} />
           </div>
         </div>
       </div>
