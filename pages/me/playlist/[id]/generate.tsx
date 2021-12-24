@@ -87,8 +87,6 @@ export default function Generate(creds: CredProps) {
     }
   }, []);
 
-  console.log(danceability)
-
   return (
     <div className="container">
       <div className={styles.info}>
