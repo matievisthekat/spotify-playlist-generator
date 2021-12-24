@@ -38,7 +38,7 @@ export default function DoubleSliderInput({ value, min, max, onChange, name }: P
         onChange={(_, v) => onChange(v as number[])}
         orientation="vertical"
         valueLabelDisplay="auto"
-        aria-label="vertical slider"
+        aria-label="filter slider"
         aria-valuetext={`${value?.at(0)} - ${value?.at(1)}`}
         style={{ height: "200px" }}
         color="primary"
