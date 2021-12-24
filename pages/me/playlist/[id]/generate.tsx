@@ -110,7 +110,12 @@ export default function Generate(creds: CredProps) {
       </div>
       {error && <span className="error">{error}</span>}
       <div className={styles.filters}>
-        <DoubleSliderInput value={danceability} onChange={setDanceability} min={0} max={100} />
+        <div>
+          <h5>Danceability</h5>
+          <div>
+            <DoubleSliderInput value={danceability} onChange={setDanceability} min={0} max={100} />
+          </div>
+        </div>
       </div>
       <div className={styles.results}>
         {tracks ? <></> : <span className="error">No tracks found. Maybe try some different filters?</span>}
