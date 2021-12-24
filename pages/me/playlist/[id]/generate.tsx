@@ -3,7 +3,8 @@ import { useState, useEffect } from "react";
 import Updater from "spotify-oauth-refresher";
 import DoubleSliderInput from "../../../../src/components/DoubleSliderInput";
 import ExternalLink from "../../../../src/components/ExternalLink";
-import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
+import Result from "../../../../src/components/Result";
+import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import { getCreds, CredProps } from "../../../../src/util";
 import styles from "../../../../styles/pages/Generate.module.sass";
 
@@ -33,6 +34,7 @@ export default function Generate(props: CredProps) {
   const [pl, setPl] = useState<Playlist>();
   const [loading, setLoading] = useState(false);
   const [tracks, setTracks] = useState<PlaylistTrack[]>();
+  const [filteredTracks, setFilteredTracks] = useState<PlaylistTrack[]>();
   const [danceability, setDanceability] = useState([0, 100]);
   const [acousticness, setAcousticness] = useState([0, 100]);
   const [energy, setEnergy] = useState([0, 100]);
@@ -41,6 +43,7 @@ export default function Generate(props: CredProps) {
   const [speechiness, setSpeechiness] = useState([0, 100]);
   const [valence, setValence] = useState([0, 100]);
   const [tempo, setTempo] = useState([0, 300]);
+  const [modal, setModal] = useState(-1);
   const [error, setError] = useState<string>();
   const updater = new Updater(props);
   const router = useRouter();
@@ -48,7 +51,33 @@ export default function Generate(props: CredProps) {
   const liked = id === "liked";
 
   useEffect(() => {
+    setFilteredTracks(
+      tracks?.filter(({ features }) => {
+        return (
+          features.danceability * 100 > danceability[0] &&
+          features.danceability * 100 < danceability[1] &&
+          features.acousticness * 100 > acousticness[0] &&
+          features.acousticness * 100 < acousticness[1] &&
+          features.energy * 100 > energy[0] &&
+          features.energy * 100 < energy[1] &&
+          features.instrumentalness * 100 > instrumentalness[0] &&
+          features.instrumentalness * 100 < instrumentalness[1] &&
+          features.liveness * 100 > liveness[0] &&
+          features.liveness * 100 < liveness[1] &&
+          features.speechiness * 100 > speechiness[0] &&
+          features.speechiness * 100 < speechiness[1] &&
+          features.valence * 100 > valence[0] &&
+          features.valence * 100 < valence[1] &&
+          features.tempo > tempo[0] &&
+          features.tempo < tempo[1]
+        );
+      })
+    );
+  }, [tracks, danceability, acousticness, energy, instrumentalness, liveness, speechiness, valence, tempo]);
+
+  useEffect(() => {
     setLoading(true);
+    getAllPlaylistTracks(updater, id as string).then((plTracks) => setTracks(plTracks));
     if (liked) {
       updater
         .request<SpotifyApi.UsersSavedTracksResponse>({
@@ -190,7 +219,23 @@ export default function Generate(props: CredProps) {
         </div>
       </div>
       <div className={styles.results}>
-        {tracks ? <></> : <span className="error">No tracks found. Maybe try some different filters?</span>}
+        {filteredTracks ? (
+          filteredTracks.map((t, i) => (
+            <Result
+              track={t.track}
+              features={t.features}
+              added_at={t.added_at}
+              added_by={t.added_by}
+              is_local={t.is_local}
+              showModal={i === modal}
+              setShowModal={(show) => setModal(show ? i : -1)}
+              updater={updater}
+              key={i}
+            />
+          ))
+        ) : (
+          <span className="error">No tracks found. Maybe try some different filters?</span>
+        )}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import Modal from "./Modal";
 import { categories, CategoryName, toProperCase } from "../util";
 import styles from "../../styles/components/Result.module.sass";
 
-interface Props extends Omit<SpotifyApi.PlaylistTrackObject, "is_local" | "added_by" | "added_at"> {
+interface Props {
   showModal: boolean;
   setShowModal(v: boolean): void;
   features?: SpotifyApi.AudioFeaturesObject;
@@ -17,6 +17,7 @@ interface Props extends Omit<SpotifyApi.PlaylistTrackObject, "is_local" | "added
   added_by?: SpotifyApi.UserObjectPublic;
   is_local?: boolean;
   compact?: boolean;
+  track: SpotifyApi.TrackObjectFull;
 }
 
 interface OnClickEvent extends ReactMousEvent<HTMLDivElement> {
@@ -42,7 +43,7 @@ export default function Result({
   const [displayName, setDisplayName] = useState(
     added_by.id === "you" ? "You" : added_by.id === "spotify" ? "Spotify" : "[loading]"
   );
-  
+
   const open = (e: OnClickEvent) => {
     if (
       !e.target.classList.contains(styles.result) &&
