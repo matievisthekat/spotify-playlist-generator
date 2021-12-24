@@ -33,7 +33,7 @@ export default function Generate(creds: CredProps) {
   const [pl, setPl] = useState<Playlist>();
   const [loading, setLoading] = useState(false);
   const [tracks, setTracks] = useState<PlaylistTrack>();
-  const [danceability, setDanceability] = useState<number[]>();
+  const [danceability, setDanceability] = useState([0, 100]);
   const [error, setError] = useState<string>();
   const updater = new Updater(creds);
   const router = useRouter();
@@ -86,6 +86,8 @@ export default function Generate(creds: CredProps) {
         .finally(() => setLoading(false));
     }
   }, []);
+
+  console.log(danceability)
 
   return (
     <div className="container">
