@@ -118,56 +118,72 @@ export default function Generate(props: CredProps) {
       {error && <span className="error">{error}</span>}
       <div className={styles.filters}>
         <div>
-          <h5>Danceability</h5>
+          <div className={styles.heading}>
+            <h5>Danceability</h5>
+          </div>
           <div>
             <DoubleSliderInput value={danceability} onChange={setDanceability} min={0} max={100} />
           </div>
         </div>
 
         <div>
-          <h5>Acousticness</h5>
+          <div className={styles.heading}>
+            <h5>Acousticness</h5>
+          </div>
           <div>
             <DoubleSliderInput value={acousticness} onChange={setAcousticness} min={0} max={100} />
           </div>
         </div>
 
         <div>
-          <h5>Energy</h5>
+          <div className={styles.heading}>
+            <h5>Energy</h5>
+          </div>
           <div>
             <DoubleSliderInput value={energy} onChange={setEnergy} min={0} max={100} />
           </div>
         </div>
 
         <div>
-          <h5>Instrumentalness</h5>
+          <div className={styles.heading}>
+            <h5>Instrumentalness</h5>
+          </div>
           <div>
             <DoubleSliderInput value={instrumentalness} onChange={setInstrumentalness} min={0} max={100} />
           </div>
         </div>
 
         <div>
-          <h5>Liveness</h5>
+          <div className={styles.heading}>
+            <h5>Liveness</h5>
+          </div>
           <div>
             <DoubleSliderInput value={liveness} onChange={setLiveness} min={0} max={100} />
           </div>
         </div>
 
         <div>
-          <h5>Speechiness</h5>
+          <div className={styles.heading}>
+            <h5>Speechiness</h5>
+          </div>
           <div>
             <DoubleSliderInput value={speechiness} onChange={setSpeechiness} min={0} max={100} />
           </div>
         </div>
 
         <div>
-          <h5>Valence</h5>
+          <div className={styles.heading}>
+            <h5>Valence</h5>
+          </div>
           <div>
             <DoubleSliderInput value={valence} onChange={setValence} min={0} max={100} />
           </div>
         </div>
-        
+
         <div>
-          <h5>Tempo</h5>
+          <div className={styles.heading}>
+            <h5>Tempo</h5>
+          </div>
           <div>
             <DoubleSliderInput value={tempo} onChange={setTempo} min={0} max={300} />
           </div>
