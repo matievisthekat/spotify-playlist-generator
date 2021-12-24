@@ -1,7 +1,9 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import Updater from "spotify-oauth-refresher";
+import DoubleSliderInput from "../../../../src/components/DoubleSliderInput";
 import ExternalLink from "../../../../src/components/ExternalLink";
+import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import { getCreds, CredProps } from "../../../../src/util";
 import styles from "../../../../styles/pages/Generate.module.sass";
 
@@ -30,6 +32,8 @@ export async function getStaticProps() {
 export default function Generate(creds: CredProps) {
   const [pl, setPl] = useState<Playlist>();
   const [loading, setLoading] = useState(false);
+  const [tracks, setTracks] = useState<PlaylistTrack>();
+  const [danceability, setDanceability] = useState<number[]>();
   const [error, setError] = useState<string>();
   const updater = new Updater(creds);
   const router = useRouter();
@@ -105,6 +109,12 @@ export default function Generate(creds: CredProps) {
         )}
       </div>
       {error && <span className="error">{error}</span>}
+      <div className={styles.filters}>
+        <DoubleSliderInput value={danceability} onChange={setDanceability} min={0} max={100} />
+      </div>
+      <div className={styles.results}>
+        {tracks ? <></> : <span className="error">No tracks found. Maybe try some different filters?</span>}
+      </div>
     </div>
   );
 }
