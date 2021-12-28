@@ -54,22 +54,22 @@ export default function Generate(props: CredProps) {
     setFilteredTracks(
       tracks?.filter(({ features }) => {
         return (
-          features.danceability * 100 > danceability[0] &&
-          features.danceability * 100 < danceability[1] &&
-          features.acousticness * 100 > acousticness[0] &&
-          features.acousticness * 100 < acousticness[1] &&
-          features.energy * 100 > energy[0] &&
-          features.energy * 100 < energy[1] &&
-          features.instrumentalness * 100 > instrumentalness[0] &&
-          features.instrumentalness * 100 < instrumentalness[1] &&
-          features.liveness * 100 > liveness[0] &&
-          features.liveness * 100 < liveness[1] &&
-          features.speechiness * 100 > speechiness[0] &&
-          features.speechiness * 100 < speechiness[1] &&
-          features.valence * 100 > valence[0] &&
-          features.valence * 100 < valence[1] &&
-          features.tempo > tempo[0] &&
-          features.tempo < tempo[1]
+          (features?.danceability ?? 0) * 100 > danceability[0] &&
+          (features?.danceability ?? 0) < danceability[1] &&
+          (features?.acousticness ?? 0) * 100 > acousticness[0] &&
+          (features?.acousticness ?? 0) * 100 < acousticness[1] &&
+          (features?.energy ?? 0) * 100 > energy[0] &&
+          (features?.energy ?? 0) * 100 < energy[1] &&
+          (features?.instrumentalness ?? 0) * 100 > instrumentalness[0] &&
+          (features?.instrumentalness ?? 0) * 100 < instrumentalness[1] &&
+          (features?.liveness ?? 0) * 100 > liveness[0] &&
+          (features?.liveness ?? 0) * 100 < liveness[1] &&
+          (features?.speechiness ?? 0) * 100 > speechiness[0] &&
+          (features?.speechiness ?? 0) * 100 < speechiness[1] &&
+          (features?.valence ?? 0) * 100 > valence[0] &&
+          (features?.valence ?? 0) * 100 < valence[1] &&
+          (features?.tempo ?? 0) > tempo[0] &&
+          (features?.tempo ?? 0) < tempo[1]
         );
       })
     );
