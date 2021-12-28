@@ -51,7 +51,10 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           authType: "bearer",
         })
         .then(({ data }) => setPl(data))
-        .catch((err) => setError(err.message));
+        .catch((err) => {
+          console.error(err);
+          setError(err.message);
+        });
     } else {
       updater
         .request<SpotifyApi.UsersSavedTracksResponse>({
@@ -102,7 +105,10 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
             uri: "",
           })
         )
-        .catch((err) => setError(err.message));
+        .catch((err) => {
+          console.error(err);
+          setError(err.message);
+        });
     }
 
     getAllPlaylistTracks(updater, id)
@@ -110,7 +116,10 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         setTracks(tracks);
         setShownTracks(tracks.slice(0, 50));
       })
-      .catch((err) => setError(err.message))
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -180,7 +189,9 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
               <FeatureDisplay
                 displayLike="number"
                 title="Avg. Instrumentalness"
-                value={(tracks.reduce((prev, curr) => (prev += curr.features.instrumentalness), 0) / tracks.length) * 100}
+                value={
+                  (tracks.reduce((prev, curr) => (prev += curr.features.instrumentalness), 0) / tracks.length) * 100
+                }
                 infoText="This playlist's average instrumentalness"
               />
               <FeatureDisplay

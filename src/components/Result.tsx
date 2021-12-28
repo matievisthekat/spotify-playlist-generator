@@ -79,7 +79,10 @@ export default function Result({
           authType: "bearer",
         })
         .then(({ data }) => setDisplayName(data.display_name || "unknown"))
-        .catch(() => setDisplayName("unknown"));
+        .catch((err) => {
+          console.error(err);
+          setDisplayName("unknown");
+        });
     }
   }, []);
 

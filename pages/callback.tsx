@@ -43,7 +43,7 @@ export default function Callback({ uri, clientId, clientSecret }: Props) {
           router.push("/me");
         })
         .catch((err) => {
-          console.error(err.response);
+          console.error(err);
           router.push("/");
         });
     } else {

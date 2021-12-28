@@ -100,7 +100,10 @@ export default function Generate(props: CredProps) {
             total: data.total,
           })
         )
-        .catch((err) => setError(err?.message))
+        .catch((err) => {
+          console.error(err);
+          setError(err?.message);
+        })
         .finally(() => setLoading(false));
     } else {
       updater
@@ -118,7 +121,10 @@ export default function Generate(props: CredProps) {
             total: data.tracks.total,
           })
         )
-        .catch((err) => setError(err?.message))
+        .catch((err) => {
+          console.error(err);
+          setError(err?.message);
+        })
         .finally(() => setLoading(false));
     }
   }, []);

@@ -48,7 +48,10 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
           setResults([...results, ...data.tracks.items]);
         } else setResults(data.tracks.items);
       })
-      .catch((err) => setSearchErr(err.message));
+      .catch((err) => {
+        console.error(err);
+        setSearchErr(err.message);
+      });
   };
 
   useEffect(() => {
@@ -70,7 +73,10 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
           .then(({ data }) => setPlaylists(data.items))
           .catch((err) => setError(err.message));
       })
-      .catch((err) => setError(err.message));
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      });
   }, []);
 
   useEffect(() => {
