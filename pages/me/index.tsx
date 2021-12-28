@@ -96,6 +96,8 @@ export default function Me({ clientId, clientSecret, authUrl }: CredProps) {
         <ExternalLink href={`https://open.spotify.com/user/${username}`}>{username}</ExternalLink>
       </h2>
 
+      <span className="link"><Link href="/logout">Not you? Log out</Link></span>
+
       {error ? (
         <span className="error">{error}</span>
       ) : (
