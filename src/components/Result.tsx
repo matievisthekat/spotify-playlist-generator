@@ -90,6 +90,7 @@ export default function Result({
     <>
       <Modal show={showModal} close={close}>
         <h4>{track.name}</h4>
+        {!features && <span className="error">There are no audio features for this track</span>}
         {features && (
           <div className={styles.features}>
             {Object.entries(categories).map((f, i) => {
