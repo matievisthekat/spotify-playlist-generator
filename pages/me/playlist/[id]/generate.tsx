@@ -1,9 +1,11 @@
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
+import InfiniteScroll from "react-infinite-scroller";
 import Updater from "spotify-oauth-refresher";
 import DoubleSliderInput from "../../../../src/components/DoubleSliderInput";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
+import SkeletonTrack from "../../../../src/components/SkeletonTrack";
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import { getCreds, CredProps } from "../../../../src/util";
 import styles from "../../../../styles/pages/Generate.module.sass";
@@ -33,8 +35,10 @@ export async function getStaticProps() {
 export default function Generate(props: CredProps) {
   const [pl, setPl] = useState<Playlist>();
   const [loading, setLoading] = useState(false);
+  const [loadingTracks, setLoadingTracks] = useState(false);
   const [tracks, setTracks] = useState<PlaylistTrack[]>();
   const [filteredTracks, setFilteredTracks] = useState<PlaylistTrack[]>();
+  const [shownTracks, setShownTracks] = useState<PlaylistTrack[]>([]);
   const [danceability, setDanceability] = useState([0, 100]);
   const [acousticness, setAcousticness] = useState([0, 100]);
   const [energy, setEnergy] = useState([0, 100]);
@@ -49,6 +53,10 @@ export default function Generate(props: CredProps) {
   const router = useRouter();
   const { id } = router.query;
   const liked = id === "liked";
+
+  useEffect(() => {
+    if (filteredTracks) setShownTracks(filteredTracks.slice(0, 49));
+  }, [tracks, filteredTracks]);
 
   useEffect(() => {
     setFilteredTracks(
@@ -77,7 +85,12 @@ export default function Generate(props: CredProps) {
 
   useEffect(() => {
     setLoading(true);
-    getAllPlaylistTracks(updater, id as string).then((plTracks) => setTracks(plTracks));
+
+    setLoadingTracks(true);
+    getAllPlaylistTracks(updater, id as string)
+      .then((plTracks) => setTracks(plTracks))
+      .finally(() => setLoadingTracks(false));
+
     if (liked) {
       updater
         .request<SpotifyApi.UsersSavedTracksResponse>({
@@ -226,21 +239,52 @@ export default function Generate(props: CredProps) {
       </div>
       <div className={styles.results}>
         {filteredTracks ? (
-          filteredTracks.map((t, i) => (
-            <Result
-              track={t.track}
-              features={t.features}
-              added_at={t.added_at}
-              added_by={t.added_by}
-              is_local={t.is_local}
-              showModal={i === modal}
-              setShowModal={(show) => setModal(show ? i : -1)}
-              updater={updater}
-              key={i}
-            />
-          ))
+          filteredTracks.length > 50 ? (
+            <InfiniteScroll
+              pageStart={0}
+              hasMore={shownTracks?.length < filteredTracks.length}
+              loadMore={(page) => {
+                if (page > 1) {
+                  setShownTracks([
+                    ...shownTracks,
+                    ...filteredTracks.slice(shownTracks.length - 1, shownTracks.length + 49),
+                  ]);
+                }
+              }}
+            >
+              {shownTracks.map((t, i) => (
+                <Result
+                  track={t.track}
+                  features={t.features}
+                  added_at={t.added_at}
+                  added_by={t.added_by}
+                  is_local={t.is_local}
+                  showModal={i === modal}
+                  setShowModal={(show) => setModal(show ? i : -1)}
+                  updater={updater}
+                  key={i}
+                />
+              ))}
+            </InfiniteScroll>
+          ) : (
+            filteredTracks.map((t, i) => (
+              <Result
+                track={t.track}
+                features={t.features}
+                added_at={t.added_at}
+                added_by={t.added_by}
+                is_local={t.is_local}
+                showModal={i === modal}
+                setShowModal={(show) => setModal(show ? i : -1)}
+                updater={updater}
+                key={i}
+              />
+            ))
+          )
+        ) : loadingTracks ? (
+          new Array(10).fill(null).map((_, i) => <SkeletonTrack key={i} />)
         ) : (
-          <span className="error">No tracks found. Maybe try some different filters?</span>
+          <span className="error">No tracks found</span>
         )}
       </div>
     </div>
