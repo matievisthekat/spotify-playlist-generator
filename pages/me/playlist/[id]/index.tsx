@@ -171,51 +171,51 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
               <FeatureDisplay
                 displayLike="number"
                 title="Avg. Danceability"
-                value={(tracks.reduce((prev, curr) => (prev += curr.features.danceability), 0) / tracks.length) * 100}
+                value={(tracks.reduce((prev, curr) => (prev += curr.features?.danceability ?? 0), 0) / tracks.length) * 100}
                 infoText="This playlist's average danceability"
               />
               <FeatureDisplay
                 displayLike="number"
                 title="Avg. Acouticness"
-                value={(tracks.reduce((prev, curr) => (prev += curr.features.acousticness), 0) / tracks.length) * 100}
+                value={(tracks.reduce((prev, curr) => (prev += curr.features?.acousticness ?? 0), 0) / tracks.length) * 100}
                 infoText="This playlist's average acousticness"
               />
               <FeatureDisplay
                 displayLike="number"
                 title="Avg. Energy"
-                value={(tracks.reduce((prev, curr) => (prev += curr.features.energy), 0) / tracks.length) * 100}
+                value={(tracks.reduce((prev, curr) => (prev += curr.features?.energy ?? 0), 0) / tracks.length) * 100}
                 infoText="This playlist's average energy"
               />
               <FeatureDisplay
                 displayLike="number"
                 title="Avg. Instrumentalness"
                 value={
-                  (tracks.reduce((prev, curr) => (prev += curr.features.instrumentalness), 0) / tracks.length) * 100
+                  (tracks.reduce((prev, curr) => (prev += curr.features?.instrumentalness ?? 0), 0) / tracks.length) * 100
                 }
                 infoText="This playlist's average instrumentalness"
               />
               <FeatureDisplay
                 displayLike="number"
                 title="Avg. Liveness"
-                value={(tracks.reduce((prev, curr) => (prev += curr.features.liveness), 0) / tracks.length) * 100}
+                value={(tracks.reduce((prev, curr) => (prev += curr.features?.liveness ?? 0), 0) / tracks.length) * 100}
                 infoText="This playlist's average liveness"
               />
               <FeatureDisplay
                 displayLike="number"
                 title="Avg. Speechiness"
-                value={(tracks.reduce((prev, curr) => (prev += curr.features.speechiness), 0) / tracks.length) * 100}
+                value={(tracks.reduce((prev, curr) => (prev += curr.features?.speechiness ?? 0), 0) / tracks.length) * 100}
                 infoText="This playlist's average speechiness"
               />
               <FeatureDisplay
                 displayLike="number"
                 title="Avg. Positivity"
-                value={(tracks.reduce((prev, curr) => (prev += curr.features.valence), 0) / tracks.length) * 100}
+                value={(tracks.reduce((prev, curr) => (prev += curr.features?.valence ?? 0), 0) / tracks.length) * 100}
                 infoText="This playlist's average positivity"
               />
               <FeatureDisplay
                 displayLike="text"
                 title="Avg. Tempo"
-                text={(tracks.reduce((prev, curr) => (prev += curr.features.tempo), 0) / tracks.length).toFixed(2)}
+                text={(tracks.reduce((prev, curr) => (prev += curr.features?.tempo ?? 0), 0) / tracks.length).toFixed(2)}
                 infoText="This playlist's average tempo"
               />
             </>
