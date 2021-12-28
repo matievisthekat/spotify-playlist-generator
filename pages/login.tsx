@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { getCreds, scope } from "../src/util";
+import { getCreds } from "../src/util";
 
 interface Props {
   url: string;
