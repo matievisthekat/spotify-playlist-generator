@@ -4,8 +4,8 @@ interface Args {
   tracks: string[];
   desc?: string;
   pub?: boolean;
-  onProgress: (percent: number) => void;
-  onDone: () => void;
+  onProgress?: (percent: number) => void;
+  onDone?: () => void;
 }
 
 export const createPlaylist = (
@@ -36,7 +36,7 @@ export const createPlaylist = (
         const interval: NodeJS.Timer = setInterval(() => {
           if (currentChunk > totalChunks) {
             clearInterval(interval);
-            onDone();
+            onDone && onDone();
             return;
           }
 
@@ -48,7 +48,7 @@ export const createPlaylist = (
               data: { uris: chunk },
               authType: "bearer",
             })
-            .then(() => onProgress((currentChunk / totalChunks) * 100))
+            .then(() => onProgress && onProgress((currentChunk / totalChunks) * 100))
             .catch((err) => reject(err.response.data.error.message || err));
         }, 1000);
       })
