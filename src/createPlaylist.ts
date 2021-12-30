@@ -49,9 +49,9 @@ export const createPlaylist = (
               authType: "bearer",
             })
             .then(() => onProgress && onProgress((currentChunk / totalChunks) * 100))
-            .catch((err) => reject(err.response.data.error.message || err));
+            .catch((err) => reject(err.response?.data?.error?.message || err));
         }, 1000);
       })
-      .catch((err) => reject(err.response.data.error.message || err));
+      .catch((err) => reject(err.response?.data?.error?.message || err));
   });
 };
