@@ -6,6 +6,7 @@ import DoubleSliderInput from "../../../../src/components/DoubleSliderInput";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
+import { createPlaylist } from "../../../../src/createPlaylist";
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import { getCreds, CredProps } from "../../../../src/util";
 import styles from "../../../../styles/pages/Generate.module.sass";
@@ -35,6 +36,8 @@ export async function getStaticProps() {
 export default function Generate(props: CredProps) {
   const [pl, setPl] = useState<Playlist>();
   const [newPlName, setNewPlName] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [creatingProgress, setCreatingProgress] = useState(0);
   const [loading, setLoading] = useState(false);
   const [loadingTracks, setLoadingTracks] = useState(false);
   const [tracks, setTracks] = useState<PlaylistTrack[]>();
@@ -143,6 +146,14 @@ export default function Generate(props: CredProps) {
     }
   }, []);
 
+  if (creating)
+    return (
+      <div className={styles.creatingOverlay} style={{ textAlign: "center", marginTop: "10px" }}>
+        <h1>{creatingProgress}%</h1>
+        {error && <h2 className="error">{error}</h2>}
+      </div>
+    );
+
   return (
     <div className="container">
       <div className={styles.info}>
@@ -160,20 +171,47 @@ export default function Generate(props: CredProps) {
       </div>
       <form
         className={styles.newPlInfo}
-        onSubmit={(e) => {
+        onSubmit={async (e) => {
           e.preventDefault();
           if (!newPlName) return setError("No playlist name provided");
+          if (!filteredTracks)
+            return setError("You can't create a playlist with no tracks! Maybe try some different filters");
+
+          setCreating(true);
+          setError(undefined);
+
+          const { data } = await updater.request<SpotifyApi.UserObjectPublic>({
+            method: "GET",
+            url: "https://api.spotify.com/v1/me",
+            authType: "bearer",
+          });
+
+          await createPlaylist(
+            newPlName,
+            data.id,
+            {
+              tracks: filteredTracks.map((t) => t.track.id),
+              pub: true,
+              onDone: (pl) => router.push(`/me/playlist/${pl.id}`),
+              onProgress: setCreatingProgress,
+            },
+            updater
+          ).catch((e) => {
+            console.log(e);
+            setError(e.message || e.toString());
+          });
         }}
       >
         <div>
-        <input
-          type="text"
-          placeholder="Playlist name"
-          value={newPlName}
-          onChange={(e) => setNewPlName(e.target.value)}
-          autoFocus
-        />
-        <button type="submit">Create</button></div>
+          <input
+            type="text"
+            placeholder="Playlist name"
+            value={newPlName}
+            onChange={(e) => setNewPlName(e.target.value)}
+            autoFocus
+          />
+          <button type="submit">Create</button>
+        </div>
         <div style={{ fontStyle: "italic" }}>
           Filter the tracks below, then click &quot;Create&quot; to create a new playlist with the filtered tracks!
         </div>
