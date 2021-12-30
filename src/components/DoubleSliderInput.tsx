@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Slider from "@material-ui/core/Slider";
 import { ThemeProvider, createTheme } from "@material-ui/core/styles";
 
@@ -7,8 +8,7 @@ interface Props {
   step?: number;
   name?: string;
 
-  value?: number[];
-  onChange(v: number[]): void;
+  onChangeCommitted(v: number[]): void;
 }
 
 const theme = createTheme({
@@ -27,7 +27,9 @@ const theme = createTheme({
   },
 });
 
-export default function DoubleSliderInput({ value, min, max, onChange, name }: Props) {
+export default function DoubleSliderInput({ min, max, onChangeCommitted, name }: Props) {
+  const [value, setValue] = useState([min, max]);
+
   return (
     <ThemeProvider theme={theme}>
       <Slider
@@ -35,11 +37,12 @@ export default function DoubleSliderInput({ value, min, max, onChange, name }: P
         max={max}
         value={value}
         name={name}
-        onChange={(_, v) => onChange(v as number[])}
+        onChange={(_, v) => setValue(v as number[])}
+        onChangeCommitted={(_, v) => onChangeCommitted(v as number[])}
         orientation="vertical"
         valueLabelDisplay="auto"
         getAriaLabel={() => `${name} filter slider`}
-        getAriaValueText={() => `${name} filter slider value: ${value ? value.join(" - ") : "none"}`}
+        getAriaValueText={() => `${value[0]} - ${value[1]}`}
         style={{ height: "200px" }}
         color="primary"
       />
