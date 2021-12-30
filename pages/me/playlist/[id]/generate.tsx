@@ -150,17 +150,11 @@ export default function Generate(props: CredProps) {
             <img src={pl.image} width={100} height={100} alt="Playlist cover image" />
           </span>
         )}
-        <h2>{loading ? `Fetching playlist ${id}...` : pl?.name}</h2>
+        <h2 style={{ display: "block" }}>{loading ? `Fetching playlist ${id}...` : pl?.name}</h2>
         {pl && (
-          <>
-            <br />
-            <small className={styles.credits}>
-              by{" "}
-              <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.display_name || pl.owner.id}</ExternalLink>
-            </small>
-            <br />
-            <span>{pl.total} tracks</span>
-          </>
+          <div className={styles.credits}>
+            by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.display_name || pl.owner.id}</ExternalLink>
+          </div>
         )}
       </div>
       {error && <span className="error">{error}</span>}
