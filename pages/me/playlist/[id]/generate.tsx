@@ -34,6 +34,7 @@ export async function getStaticProps() {
 
 export default function Generate(props: CredProps) {
   const [pl, setPl] = useState<Playlist>();
+  const [newPlName, setNewPlName] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingTracks, setLoadingTracks] = useState(false);
   const [tracks, setTracks] = useState<PlaylistTrack[]>();
@@ -157,9 +158,25 @@ export default function Generate(props: CredProps) {
           </div>
         )}
       </div>
-      <form className={styles.newPlInfo}>
-        <input type="text" placeholder="Playlist name" autoFocus />
-        <button type="submit">Create</button>
+      <form
+        className={styles.newPlInfo}
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!newPlName) return setError("No playlist name provided");
+        }}
+      >
+        <div>
+        <input
+          type="text"
+          placeholder="Playlist name"
+          value={newPlName}
+          onChange={(e) => setNewPlName(e.target.value)}
+          autoFocus
+        />
+        <button type="submit">Create</button></div>
+        <div style={{ fontStyle: "italic" }}>
+          Filter the tracks below, then click &quot;Create&quot; to create a new playlist with the filtered tracks!
+        </div>
       </form>
       {error && <span className="error">{error}</span>}
       <div className={styles.filters}>
