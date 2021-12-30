@@ -24,29 +24,28 @@
     font-style: italic
 
 .filters
-  margin-top: calc(20px + 7rem)
   margin-bottom: 50px
-  display: flex
 
+  display: flex
   flex-direction: row
   flex-wrap: nowrap
-  row-gap: 1rem
+  column-gap: 10px
 
-  & > div
-    & > div
-      display: inline-block
+  & > .col
+    display: flex
+    flex-direction: column
+    justify-content: center
+    align-items: center
 
-    & > .heading
-      $width: 70px
-      position: relative
-      width: $width
-      height: 100%
+    & > h5
+      width: 70px
+      white-space: nowrap
+      overflow: hidden
+      text-overflow: ellipsis
+      text-align: center
 
-      & > h5
-        transform: rotate(-90deg) translateX(50px)
-        position: absolute
-        width: $width
-        overflow-x: hidden
-        text-overflow: ellipsis
-        top: calc(($width / 2) - $width)
-        left: calc($width - 1.3rem)
+      &:hover,&:focus
+        white-space: normal
+        overflow: visible
+        text-decoration: underline
+        cursor: help
