@@ -40,11 +40,11 @@ export default function DoubleSliderInput({ min, max, onChangeCommitted, name }:
         onChange={(_, v) => setValue(v as number[])}
         onChangeCommitted={(_, v) => onChangeCommitted(v as number[])}
         orientation="vertical"
-        valueLabelDisplay="auto"
         getAriaLabel={() => `${name} filter slider`}
         getAriaValueText={() => `${value[0]} - ${value[1]}`}
         style={{ height: "200px" }}
         color="primary"
+        valueLabelDisplay="auto"
       />
     </ThemeProvider>
   );
