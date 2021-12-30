@@ -19,12 +19,12 @@ export const createPlaylist = (
       .request<SpotifyApi.CreatePlaylistResponse>({
         method: "POST",
         url: `https://api.spotify.com/v1/users/${userId}/playlists`,
-        data: {
+        data: JSON.stringify({
           name,
           public: pub,
           collaborative: false,
-          description: desc,
-        },
+          description: desc || "",
+        }),
         authType: "bearer",
       })
       .then(({ data }) => {
@@ -45,7 +45,7 @@ export const createPlaylist = (
             .request<SpotifyApi.AddTracksToPlaylistResponse>({
               method: "POST",
               url: `https://api.spotify.com/v1/playlists/${data.id}/tracks`,
-              data: { uris: chunk },
+              data: JSON.stringify({ uris: chunk }),
               authType: "bearer",
             })
             .then(() => onProgress && onProgress((currentChunk / totalChunks) * 100))
