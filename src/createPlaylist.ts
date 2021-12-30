@@ -1,7 +1,8 @@
 import Updater from "spotify-oauth-refresher";
+import { PlaylistTrack } from "./getPlaylistTracks";
 
 interface Args {
-  tracks: string[];
+  tracks: PlaylistTrack[];
   desc?: string;
   pub?: boolean;
   onProgress?: (percent: number) => void;
@@ -45,11 +46,13 @@ export const createPlaylist = (
             .request<SpotifyApi.AddTracksToPlaylistResponse>({
               method: "POST",
               url: `https://api.spotify.com/v1/playlists/${data.id}/tracks`,
-              data: JSON.stringify({ uris: chunk }),
+              data: JSON.stringify({ uris: chunk.map((t) => t.track.uri) }),
               authType: "bearer",
             })
             .then(() => onProgress && onProgress((currentChunk / totalChunks) * 100))
-            .catch((err) => reject(err.response?.data?.error?.message || err));
+            .catch((err) => console.log(err.response?.data?.error?.message || err));
+
+          currentChunk++;
         }, 1000);
       })
       .catch((err) => reject(err.response?.data?.error?.message || err));
