@@ -157,6 +157,10 @@ export default function Generate(props: CredProps) {
           </div>
         )}
       </div>
+      <form className={styles.newPlInfo}>
+        <input type="text" placeholder="Playlist name" autoFocus />
+        <button type="submit">Create</button>
+      </form>
       {error && <span className="error">{error}</span>}
       <div className={styles.filters}>
         <div className={styles.col}>
