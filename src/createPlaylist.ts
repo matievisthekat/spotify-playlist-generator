@@ -5,7 +5,7 @@ interface Args {
   desc?: string;
   pub?: boolean;
   onProgress?: (percent: number) => void;
-  onDone?: () => void;
+  onDone?: (pl: SpotifyApi.PlaylistObjectFull) => void;
 }
 
 export const createPlaylist = (
@@ -36,7 +36,7 @@ export const createPlaylist = (
         const interval: NodeJS.Timer = setInterval(() => {
           if (currentChunk > totalChunks) {
             clearInterval(interval);
-            onDone && onDone();
+            onDone && onDone(data);
             return;
           }
 
