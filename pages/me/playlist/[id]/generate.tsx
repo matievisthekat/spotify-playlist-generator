@@ -190,7 +190,7 @@ export default function Generate(props: CredProps) {
             newPlName,
             data.id,
             {
-              tracks: filteredTracks.map((t) => t.track.id),
+              tracks: filteredTracks,
               pub: true,
               onDone: (pl) => router.push(`/me/playlist/${pl.id}`),
               onProgress: setCreatingProgress,
