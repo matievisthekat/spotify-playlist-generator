@@ -217,6 +217,7 @@ export default function Generate(props: CredProps) {
         </div>
       </form>
       {error && <span className="error">{error}</span>}
+      {tracks && <span>{filteredTracks?.length ?? 0} out of {tracks.length}</span>}
       <div className={styles.filters}>
         <div className={styles.col}>
           <h5>Danceability</h5>
