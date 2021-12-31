@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 
-export function PlaylistIndex() {
+export const PlaylistIndex = () => {
   useEffect(() => {
     window.location.href = "/me";
   }, []);
   
-  return null;
+  return <h1>Redirecting</h1>;
 }
