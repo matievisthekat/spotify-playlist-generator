@@ -2,6 +2,8 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
 import InfiniteScroll from "react-infinite-scroller";
+import { IncomingMessage, ServerResponse } from "http";
+import { getCookie } from "cookies-next";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
@@ -11,29 +13,130 @@ import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylist
 import styles from "../../../../styles/pages/Playlist.module.sass";
 import FeatureDisplay from "../../../../src/components/FeatureDisplay";
 
-export async function getStaticPaths() {
-  return {
-    paths: [],
-    fallback: "blocking",
-  };
+interface Props extends CredProps {
+  playlist?: SpotifyApi.PlaylistObjectFull;
+  tracks?: PlaylistTrack[];
+  error?: string;
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps({ req, res, resolvedUrl }: { req: IncomingMessage, res: ServerResponse, resolvedUrl: string }) {
+  const id = resolvedUrl.split("/").pop() as string;
+  const isLikedSongs = id === "liked"
+
+  let error = "";
+  let playlist: SpotifyApi.PlaylistObjectFull;
+  const creds = getCreds();
+  const accessToken = getCookie("access_token", { req, res }) as string | undefined;
+  const refreshToken = getCookie("refresh_token", { req, res }) as string | undefined;
+
+  if (!accessToken || !refreshToken) {
+    return {
+      redirect: {
+        destination: "/login",
+        permanent: true
+      }
+    }
+  }
+
+  const updater = new Updater({ clientId: creds.clientId, clientSecret: creds.clientSecret });
+  updater.setAccessToken(accessToken).setRefreshToken(refreshToken);
+
+  if (!isLikedSongs) {
+    const res = await updater.request<SpotifyApi.SinglePlaylistResponse>({
+        url: `https://api.spotify.com/v1/playlists/${id}`,
+        authType: "bearer",
+      }).catch((err) => {
+        console.error(err);
+        error = err.message;
+      });
+
+    if (!res) {
+      return {
+        props: { error }
+      }
+    }
+
+    playlist = res.data;
+  } else {
+    const res = await updater.request<SpotifyApi.UsersSavedTracksResponse>({
+        url: `https://api.spotify.com/v1/me/tracks`,
+        authType: "bearer",
+      }).catch((err) => {
+        console.error(err);
+        error = err.message;
+      });
+
+    if (!res) {
+      return {
+        props: { error }
+      }
+    }
+
+    playlist = {
+      name: "Liked Songs",
+      followers: {
+        href: null,
+        total: 0,
+      },
+      tracks: {
+        href: "",
+        total: res.data.total,
+        limit: 50,
+        next: null,
+        previous: null,
+        items: [],
+        offset: 0,
+      },
+      collaborative: false,
+      description: "",
+      id: "liked",
+      images: [
+        {
+          url: "/liked.png",
+        },
+      ],
+      owner: {
+        uri: "https://open.spotify.com",
+        id: "",
+        display_name: "you",
+        external_urls: {
+          spotify: "https://open.spotify.com",
+        },
+        href: "",
+        type: "user",
+      },
+      public: false,
+      snapshot_id: "",
+      type: "playlist",
+      href: "",
+      external_urls: {
+        spotify: "https://open.spotify.com/collection/tracks",
+      },
+      uri: "",
+    };
+  }
+
+  const tracks = await getAllPlaylistTracks(updater, id).catch((err) => {
+    console.error(err);
+    error = err.message;
+  });
+
   return {
-    props: getCreds(),
-  };
+    props: {
+      ...getCreds(),
+      playlist,
+      tracks
+    }
+  }
 }
 
-export default function Playlist({ clientId, clientSecret, authUrl }: CredProps) {
+export default function Playlist({ clientId, clientSecret, error, playlist, tracks: serverTracks }: Props) {
   const updater = new Updater({ clientId, clientSecret });
-  const [pl, setPl] = useState<SpotifyApi.SinglePlaylistResponse>();
-  const [tracks, _setTracks] = useState<PlaylistTrack[]>([]);
+  const [tracks, _setTracks] = useState<PlaylistTrack[]>(serverTracks || []);
   const [shownTracks, _setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [sort, setSort] = useState<Sort>("default");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const router = useRouter();
   const id = router.query.id as string;
   const liked = id === "liked";
@@ -42,89 +145,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
   const setTracks = (tracks: PlaylistTrack[]) => _setTracks(sortTracks(sortOrder, sort, tracks));
 
   useEffect(() => {
-    requireLogin(updater, authUrl);
-
-    if (!liked) {
-      updater
-        .request<SpotifyApi.SinglePlaylistResponse>({
-          url: `https://api.spotify.com/v1/playlists/${id}`,
-          authType: "bearer",
-        })
-        .then(({ data }) => setPl(data))
-        .catch((err) => {
-          console.error(err);
-          setError(err.message);
-        });
-    } else {
-      updater
-        .request<SpotifyApi.UsersSavedTracksResponse>({
-          url: `https://api.spotify.com/v1/me/tracks`,
-          authType: "bearer",
-        })
-        .then(({ data }) =>
-          setPl({
-            name: "Liked Songs",
-            followers: {
-              href: null,
-              total: 0,
-            },
-            tracks: {
-              href: "",
-              total: data.total,
-              limit: 50,
-              next: null,
-              previous: null,
-              items: [],
-              offset: 0,
-            },
-            collaborative: false,
-            description: "",
-            id: "liked",
-            images: [
-              {
-                url: "/liked.png",
-              },
-            ],
-            owner: {
-              uri: "https://open.spotify.com",
-              id: "",
-              display_name: "you",
-              external_urls: {
-                spotify: "https://open.spotify.com",
-              },
-              href: "",
-              type: "user",
-            },
-            public: false,
-            snapshot_id: "",
-            type: "playlist",
-            href: "",
-            external_urls: {
-              spotify: "https://open.spotify.com/collection/tracks",
-            },
-            uri: "",
-          })
-        )
-        .catch((err) => {
-          console.error(err);
-          setError(err.message);
-        });
-    }
-
-    getAllPlaylistTracks(updater, id)
-      .then((tracks) => {
-        setTracks(tracks);
-        setShownTracks(tracks.slice(0, 50));
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(err.message);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    if (tracks.length === pl?.tracks.total) {
+    if (tracks.length === playlist?.tracks.total) {
       setTracks(tracks);
       setShownTracks(tracks.slice(0, 50));
     }
@@ -132,21 +153,21 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
 
   return (
     <div className="container">
-      {pl && (
+      {playlist && (
         <span className={styles.cover}>
-          <img src={pl.images[0].url} width={200} height={200} alt="Playlist cover image" />
+          <img src={playlist.images[0].url} width={200} height={200} alt="Playlist cover image" />
         </span>
       )}
       <h2>
-        {loading ? `Fetching playlist '${id}'...` : liked ? "Liked Songs" : pl ? pl.name : `Unknown`}
+        {liked ? "Liked Songs" : playlist ? playlist.name : `Unknown`}
         <GenerateButton href={`/me/playlist/${id}/generate`} />
       </h2>
-      {pl && (
+      {playlist && (
         <span className={styles.credits}>
-          Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.display_name}</ExternalLink>
+          Created by <ExternalLink href={playlist.owner.external_urls.spotify}>{playlist.owner.display_name}</ExternalLink>
         </span>
       )}
-      {pl && pl.description && <span>{escapeHex(pl.description)}</span>}
+      {playlist && playlist.description && <span>{escapeHex(playlist.description)}</span>}
       <span>
         <select onChange={(e) => setSort(e.target.value as Sort)} value={sort}>
           <option value="default">Default</option>
@@ -166,7 +187,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
       {error && <span className="error">{error}</span>}
       <main>
         <div className={styles.average}>
-          {tracks.length === pl?.tracks.total ? (
+          {tracks.length === playlist?.tracks.total ? (
             <>
               <FeatureDisplay
                 displayLike="number"
@@ -224,12 +245,12 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           )}
         </div>
         <div className={styles.tracks}>
-          {tracks.length === pl?.tracks.total ? (
+          {tracks.length === playlist?.tracks.total ? (
             /*
             You may be wondering why im still scroll-loading the tracks when i spent
             a lot of time making it possible to get all the tracks at once. Well
-            rendering 800+ tracks litterally crashes the browser. So having all the tracks
-            in memory makes sorting possible while still being useable.
+            rendering 800+ tracks literally crashes the browser. So having all the tracks
+            in memory makes sorting possible while still being usable.
 
             thank you for coming to my ted talk
             */

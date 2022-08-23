@@ -1,7 +1,7 @@
 import Updater from "spotify-oauth-refresher";
 
 export interface PlaylistTrack extends SpotifyApi.PlaylistTrackObject {
-  features?: SpotifyApi.AudioFeaturesObject;
+  features?: SpotifyApi.AudioFeaturesObject | null;
 }
 
 export const getPageOfPlaylistTracks = (updater: Updater, id: string, limit: number, offset: number) => {
@@ -49,7 +49,7 @@ export const getAllPlaylistTracks = async (updater: Updater, id: string) => {
       page.items.forEach((item, i) => {
         tracks.push({
           ...item,
-          features: features.data.audio_features.find((f) => f?.id === item.track.id) ?? undefined,
+          features: features.data.audio_features.find((f) => f?.id === item.track.id) ?? null,
         });
       });
     } else continueAllLoop = false;

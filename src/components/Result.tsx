@@ -11,7 +11,7 @@ import styles from "../../styles/components/Result.module.sass";
 interface Props {
   showModal: boolean;
   setShowModal(v: boolean): void;
-  features?: SpotifyApi.AudioFeaturesObject;
+  features?: SpotifyApi.AudioFeaturesObject | null;
   updater: Updater;
   added_at?: string;
   added_by?: SpotifyApi.UserObjectPublic;
