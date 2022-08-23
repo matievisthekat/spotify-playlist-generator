@@ -1,9 +1,10 @@
-import { useRouter } from "next/router";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 import qs from "querystring";
 import axios from "axios";
-import { CredProps, getCreds } from "../src/util";
 import Updater from "spotify-oauth-refresher";
+import { setCookie } from "cookies-next";
+import { CredProps, getCreds } from "../src/util";
 import { ServerResponse, IncomingMessage } from "http";
 
 interface Props extends CredProps {
@@ -11,7 +12,7 @@ interface Props extends CredProps {
   refresh_token: string;
 }
 
-export async function getServerSideProps({ resolvedUrl }: { resolvedUrl: string }) {
+export async function getServerSideProps({ req, res, resolvedUrl }: { req: IncomingMessage, res: ServerResponse, resolvedUrl: string }) {
   const creds = getCreds();
   const base64 = Buffer.from(`${creds.clientId}:${creds.clientSecret}`).toString("base64url");
   const { code } = qs.parse(resolvedUrl.split("?").pop() || "");
@@ -47,6 +48,8 @@ export async function getServerSideProps({ resolvedUrl }: { resolvedUrl: string 
     };
   } else {
     const { access_token, refresh_token } = response.data;
+    setCookie("access_token", access_token, { req, res });
+    setCookie("refresh_token", refresh_token, { req, res });
     return { props: { access_token, refresh_token, clientId: creds.clientId, clientSecret: creds.clientSecret } };
   }
 }
