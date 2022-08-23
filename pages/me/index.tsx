@@ -16,8 +16,8 @@ const PlaylistWithRef = forwardRef(Playlist);
 
 interface Props extends CredProps {
   updater: Updater;
-  me: SpotifyApi.CurrentUsersProfileResponse;
-  playlists: SpotifyApi.PlaylistObjectFull[];
+  me?: SpotifyApi.CurrentUsersProfileResponse;
+  playlists?: SpotifyApi.PlaylistObjectFull[];
   error?: string;
 }
 
@@ -84,7 +84,7 @@ export default function Me({ me, authUrl, clientId, clientSecret, playlists, err
   const [modal, setModal] = useState(-1);
   const [hasMore, setHasMore] = useState(true);
   const initialPlaylists = 2;
-  const username = me.id;
+  const username = me?.id;
   const updater = new Updater({ clientId, clientSecret });
 
   const search = (offset: number) => {
