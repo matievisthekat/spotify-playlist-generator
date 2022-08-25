@@ -15,11 +15,11 @@ export class TokenCookies {
   }
 
   static accessToken(req?: IncomingMessage, res?: ServerResponse) {
-    return getCookie("access_token", { req, res });
+    return getCookie("access_token", { req, res })?.toString() ?? "";
   }
 
   static refreshToken(req?: IncomingMessage, res?: ServerResponse) {
-    return getCookie("refresh_token", { req, res });
+    return getCookie("refresh_token", { req, res })?.toString() ?? "";
   }
 }
 
