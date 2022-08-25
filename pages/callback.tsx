@@ -1,16 +1,9 @@
-import { useEffect } from "react";
-import { useRouter } from "next/router";
 import qs from "querystring";
 import axios from "axios";
-import Updater from "spotify-oauth-refresher";
 import { setCookie } from "cookies-next";
-import { CredProps, getCreds } from "../src/util";
+import { getCreds, TokenCookies } from "../src/util";
 import { ServerResponse, IncomingMessage } from "http";
-
-interface Props extends CredProps {
-  access_token: string;
-  refresh_token: string;
-}
+import Link from "next/link";
 
 export async function getServerSideProps({ req, res, resolvedUrl }: { req: IncomingMessage, res: ServerResponse, resolvedUrl: string }) {
   const creds = getCreds();
@@ -48,29 +41,15 @@ export async function getServerSideProps({ req, res, resolvedUrl }: { req: Incom
     };
   } else {
     const { access_token, refresh_token } = response.data;
-    setCookie("access_token", access_token, { req, res });
-    setCookie("refresh_token", refresh_token, { req, res });
-    return { props: { access_token, refresh_token, clientId: creds.clientId, clientSecret: creds.clientSecret } };
+    TokenCookies.setAccessToken(access_token, req, res).setRefreshToken(refresh_token, req, res);
   }
 }
 
-export default function Callback({ clientId, clientSecret, access_token, refresh_token }: Props) {
-  const router = useRouter();
-  const updater = new Updater({ clientId, clientSecret });
-
-  useEffect(() => {
-    if (access_token) {
-      updater.setAccessToken(access_token).setRefreshToken(refresh_token);
-      router.push("/me");
-    } else {
-      router.push("/");
-    }
-  }, []);
-
+export default function Callback() {
   return (
     <div className="container">
       <main>
-        <h1>Redirecting...</h1>
+        <h1>Click <Link href={"/me"}>here</Link> to continue...</h1>
       </main>
     </div>
   );

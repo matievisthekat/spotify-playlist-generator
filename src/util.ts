@@ -1,5 +1,27 @@
 import Updater from "spotify-oauth-refresher";
 import { PlaylistTrack } from "./getPlaylistTracks";
+import { setCookie, getCookie } from "cookies-next";
+import { IncomingMessage, ServerResponse } from "http";
+
+export class TokenCookies {
+  static setAccessToken(token: string, req?: IncomingMessage, res?: ServerResponse) {
+    setCookie("access_token", token, { req, res });
+    return this;
+  }
+
+  static setRefreshToken(token: string, req?: IncomingMessage, res?: ServerResponse) {
+    setCookie("refresh_token", token, { req, res });
+    return this;
+  }
+
+  static accessToken(req?: IncomingMessage, res?: ServerResponse) {
+    return getCookie("access_token", { req, res });
+  }
+
+  static refreshToken(req?: IncomingMessage, res?: ServerResponse) {
+    return getCookie("refresh_token", { req, res });
+  }
+}
 
 export function sortTracks(order: "asc" | "desc", sort: Sort, array: PlaylistTrack[]) {
   const desc = order === "desc";
