@@ -1,5 +1,5 @@
-import { IncomingMessage, ServerResponse } from "http";
+import { NextApiResponse, NextApiRequest } from "next";
 
-export default function handler(req: IncomingMessage, res: ServerResponse) {
+export default function handler(req: NextApiRequest, res: NextApiResponse) {
 
 }
