@@ -42,6 +42,12 @@ export async function getServerSideProps({ req, res, resolvedUrl }: { req: Incom
   } else {
     const { access_token, refresh_token } = response.data;
     TokenCookies.setAccessToken(access_token, req, res).setRefreshToken(refresh_token, req, res);
+    return {
+      redirect: {
+        destination: "/me",
+        permanent: true
+      }
+    }
   }
 }
 
