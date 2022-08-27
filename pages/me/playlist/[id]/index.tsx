@@ -2,147 +2,51 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
 import InfiniteScroll from "react-infinite-scroller";
-import { IncomingMessage, ServerResponse } from "http";
-import { getCookie } from "cookies-next";
+import axios from "axios";
+import qs from "querystring";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
-import { CredProps, escapeHex, getCreds, requireLogin, Sort, sortTracks, SortOrder } from "../../../../src/util";
-import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
-import styles from "../../../../styles/pages/Playlist.module.sass";
 import FeatureDisplay from "../../../../src/components/FeatureDisplay";
+import { escapeHex, Sort, sortTracks, SortOrder } from "../../../../src/util";
+import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
+import { ApiMePlaylistIdResponse } from "../../../api/me/playlist/[id]";
+import styles from "../../../../styles/pages/Playlist.module.sass";
+import { ApiMePlaylistTracksResponse } from "../../../api/me/playlist/[id]/tracks";
 
-interface Props extends CredProps {
-  playlist?: SpotifyApi.PlaylistObjectFull;
-  tracks?: PlaylistTrack[];
-  error?: string;
-}
-
-export async function getServerSideProps({ req, res, resolvedUrl }: { req: IncomingMessage, res: ServerResponse, resolvedUrl: string }) {
-  const id = resolvedUrl.split("/").pop() as string;
-  const isLikedSongs = id === "liked"
-
-  let error = "";
-  let playlist: SpotifyApi.PlaylistObjectFull;
-  const creds = getCreds();
-  const accessToken = getCookie("access_token", { req, res }) as string | undefined;
-  const refreshToken = getCookie("refresh_token", { req, res }) as string | undefined;
-
-  if (!accessToken || !refreshToken) {
-    return {
-      redirect: {
-        destination: "/login",
-        permanent: true
-      }
-    }
-  }
-
-  const updater = new Updater({ clientId: creds.clientId, clientSecret: creds.clientSecret });
-  updater.setAccessToken(accessToken).setRefreshToken(refreshToken);
-
-  if (!isLikedSongs) {
-    const res = await updater.request<SpotifyApi.SinglePlaylistResponse>({
-        url: `https://api.spotify.com/v1/playlists/${id}`,
-        authType: "bearer",
-      }).catch((err) => {
-        console.error(err);
-        error = err.message;
-      });
-
-    if (!res) {
-      return {
-        props: { error }
-      }
-    }
-
-    playlist = res.data;
-  } else {
-    const res = await updater.request<SpotifyApi.UsersSavedTracksResponse>({
-        url: `https://api.spotify.com/v1/me/tracks`,
-        authType: "bearer",
-      }).catch((err) => {
-        console.error(err);
-        error = err.message;
-      });
-
-    if (!res) {
-      return {
-        props: { error }
-      }
-    }
-
-    playlist = {
-      name: "Liked Songs",
-      followers: {
-        href: null,
-        total: 0,
-      },
-      tracks: {
-        href: "",
-        total: res.data.total,
-        limit: 50,
-        next: null,
-        previous: null,
-        items: [],
-        offset: 0,
-      },
-      collaborative: false,
-      description: "",
-      id: "liked",
-      images: [
-        {
-          url: "/liked.png",
-        },
-      ],
-      owner: {
-        uri: "https://open.spotify.com",
-        id: "",
-        display_name: "you",
-        external_urls: {
-          spotify: "https://open.spotify.com",
-        },
-        href: "",
-        type: "user",
-      },
-      public: false,
-      snapshot_id: "",
-      type: "playlist",
-      href: "",
-      external_urls: {
-        spotify: "https://open.spotify.com/collection/tracks",
-      },
-      uri: "",
-    };
-  }
-
-  const tracks = await getAllPlaylistTracks(updater, id).catch((err) => {
-    console.error(err);
-    error = err.message;
-  });
-
-  return {
-    props: {
-      ...getCreds(),
-      playlist,
-      tracks
-    }
-  }
-}
-
-export default function Playlist({ clientId, clientSecret, error, playlist, tracks: serverTracks }: Props) {
-  const updater = new Updater({ clientId, clientSecret });
-  const [tracks, _setTracks] = useState<PlaylistTrack[]>(serverTracks || []);
+export default function Playlist() {
+  const [updater, setUpdater] = useState<Updater>();
+  const [playlist, setPlaylist] = useState<SpotifyApi.PlaylistObjectFull>();
+  const [tracks, _setTracks] = useState<PlaylistTrack[]>([]);
   const [shownTracks, _setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
   const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [sort, setSort] = useState<Sort>("default");
+  const [error, setError] = useState("");
   const router = useRouter();
-  const id = router.query.id as string;
+  const id = router.query.id;
   const liked = id === "liked";
 
   const setShownTracks = (tracks: PlaylistTrack[]) => _setShownTracks(sortTracks(sortOrder, sort, tracks));
   const setTracks = (tracks: PlaylistTrack[]) => _setTracks(sortTracks(sortOrder, sort, tracks));
+
+  useEffect(() => {
+    if (id !== undefined) {
+      axios.get<ApiMePlaylistIdResponse>(`/api/me/playlist/${id}`)
+        .then((res) => {
+          setPlaylist(res.data.playlist);
+          setUpdater(new Updater({ clientId: res.data.clientId, clientSecret: res.data.clientSecret }));
+
+          axios.get<ApiMePlaylistTracksResponse>(`/api/me/playlist/${id}/tracks`)
+            .then((res) => {
+              setTracks(res.data.tracks);
+            })
+            .catch((err) => setError(err.toString()));
+        })
+        .catch((err) => setError(err.toString()));
+    }
+  }, [id]);
 
   useEffect(() => {
     if (tracks.length === playlist?.tracks.total) {
@@ -263,7 +167,7 @@ export default function Playlist({ clientId, clientSecret, error, playlist, trac
                 }
               }}
             >
-              {shownTracks.map((t, i) => (
+              {updater && shownTracks.map((t, i) => (
                 <Result
                   {...t}
                   setShowModal={(v: boolean) => setModal(v ? i : -1)}
