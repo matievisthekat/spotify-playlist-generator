@@ -19,7 +19,7 @@ export default function Me() {
   const [playlists, setPlaylists] = useState<SpotifyApi.PlaylistObjectSimplified[]>([]);
   const [error, setError] = useState("");
   const [searchErr, setSearchErr] = useState("");
-  const [results, setResults] = useState<SpotifyApi.TrackObjectFull[]>();
+  const [results, setResults] = useState<(SpotifyApi.TrackObjectFull & { audio_features: SpotifyApi.AudioFeaturesObject })[]>();
   const [showMorePl, setShowMorePl] = useState(false);
   const [query, setQuery] = useState("");
   const [modal, setModal] = useState(-1);
@@ -55,8 +55,6 @@ export default function Me() {
 
         const { clientId, clientSecret } = res.data;
         setUpdater(new Updater({ clientId, clientSecret }));
-
-
       }).catch(setError);
   }, []);
 
@@ -143,11 +141,12 @@ export default function Me() {
                       showModal={i === modal}
                       setShowModal={(v: boolean) => setModal(v ? i : -1)}
                       track={t}
+                      features={t.audio_features}
                     />
                   ))}
                 </InfiniteScroll>
               ) : (
-                "no results"
+                <div style={{ marginBottom: "30px" }}>no results</div>
               )}
             </div>
           </main>

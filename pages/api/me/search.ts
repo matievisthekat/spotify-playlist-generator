@@ -1,9 +1,10 @@
 import { NextApiResponse, NextApiRequest } from "next";
 import { getCreds, TokenCookies } from "../../../src/util";
 import Updater from "spotify-oauth-refresher";
+import { PlaylistTrack } from "../../../src/getPlaylistTracks";
 
 export interface ApiSearchResponse {
-  tracks: SpotifyApi.TrackObjectFull[];
+  tracks: (SpotifyApi.TrackObjectFull & { audio_features: SpotifyApi.AudioFeaturesObject })[];
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -26,12 +27,25 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       },
       authType: "bearer",
     })
-    .then((searchRes) => {
+    .then(async (searchRes) => {
       if (searchRes.status !== 200) return res.status(500).json(searchRes.data);
 
-      res.status(200).json({
-        tracks: searchRes.data.tracks.items
+      const features = await updater.request<{ audio_features: Array<SpotifyApi.AudioFeaturesObject | null> }>({
+        method: "GET",
+        url: "https://api.spotify.com/v1/audio-features",
+        params: { ids: searchRes.data.tracks.items.map((item) => item.id).join(",") },
+        authType: "bearer",
       });
+
+      const tracks = searchRes.data.tracks.items.map((t, i) => {
+        return {
+          ...t,
+          audio_features: features.data.audio_features[i]
+        }
+      });
+
+
+      res.status(200).json({ tracks });
     })
     .catch((err) => res.status(500).json(err))
 }
