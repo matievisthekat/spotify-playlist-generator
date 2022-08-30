@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
 import InfiniteScroll from "react-infinite-scroller";
 import axios from "axios";
-import qs from "querystring";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
@@ -12,8 +11,8 @@ import FeatureDisplay from "../../../../src/components/FeatureDisplay";
 import { escapeHex, Sort, sortTracks, SortOrder } from "../../../../src/util";
 import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import { ApiMePlaylistIdResponse } from "../../../api/me/playlist/[id]";
-import styles from "../../../../styles/pages/Playlist.module.sass";
 import { ApiMePlaylistTracksResponse } from "../../../api/me/playlist/[id]/tracks";
+import styles from "../../../../styles/pages/Playlist.module.sass";
 
 export default function Playlist() {
   const [updater, setUpdater] = useState<Updater>();
@@ -31,6 +30,19 @@ export default function Playlist() {
   const setShownTracks = (tracks: PlaylistTrack[]) => _setShownTracks(sortTracks(sortOrder, sort, tracks));
   const setTracks = (tracks: PlaylistTrack[]) => _setTracks(sortTracks(sortOrder, sort, tracks));
 
+  const getPage = (pageNum: number) => {
+    return new Promise<PlaylistTrack[]>((resolve, reject) => {
+      if (id === undefined) reject();
+      axios.get<ApiMePlaylistTracksResponse>(`/api/me/playlist/${id}/tracks?limit=50&offset=${pageNum * 50}`)
+        .then((res) => {
+          resolve(res.data.tracks);
+        })
+        .catch(reject);
+    })
+  }
+
+  useEffect(() => console.log(error), [error]);
+
   useEffect(() => {
     if (id !== undefined) {
       axios.get<ApiMePlaylistIdResponse>(`/api/me/playlist/${id}`)
@@ -38,11 +50,15 @@ export default function Playlist() {
           setPlaylist(res.data.playlist);
           setUpdater(new Updater({ clientId: res.data.clientId, clientSecret: res.data.clientSecret }));
 
-          axios.get<ApiMePlaylistTracksResponse>(`/api/me/playlist/${id}/tracks`)
-            .then((res) => {
-              setTracks(res.data.tracks);
-            })
-            .catch((err) => setError(err.toString()));
+          getPage(1).then(async (pageZeroTracks) => {
+            setShownTracks(pageZeroTracks);
+
+            setTracks(pageZeroTracks);
+            for (let page = 1; page * 50 >= res.data.playlist.tracks.total; page++) {
+              const pageTracks = await getPage(page);
+              setTracks(tracks.concat(pageTracks));
+            }
+          });
         })
         .catch((err) => setError(err.toString()));
     }
@@ -149,7 +165,7 @@ export default function Playlist() {
           )}
         </div>
         <div className={styles.tracks}>
-          {tracks.length === playlist?.tracks.total ? (
+          {shownTracks.length > 0 ? (
             /*
             You may be wondering why im still scroll-loading the tracks when i spent
             a lot of time making it possible to get all the tracks at once. Well
@@ -160,14 +176,14 @@ export default function Playlist() {
             */
             <InfiniteScroll
               pageStart={0}
-              hasMore={shownTracks.length < tracks.length}
+              hasMore={shownTracks.length < (playlist?.tracks.total ?? 0)}
               loadMore={(page) => {
-                if (page > 1) {
+                if (page > 1 && shownTracks.length > 0) {
                   setShownTracks([...shownTracks, ...tracks.slice(shownTracks.length - 1, shownTracks.length + 49)]);
                 }
               }}
             >
-              {updater && shownTracks.map((t, i) => (
+              {updater ? shownTracks.map((t, i) => (
                 <Result
                   {...t}
                   setShowModal={(v: boolean) => setModal(v ? i : -1)}
@@ -176,7 +192,7 @@ export default function Playlist() {
                   key={i}
                   compact
                 />
-              ))}
+              )) : <></>}
             </InfiniteScroll>
           ) : (
             new Array(10).fill(null).map((_, i) => <SkeletonTrack key={i} />)
