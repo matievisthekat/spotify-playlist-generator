@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
 import InfiniteScroll from "react-infinite-scroller";
+import { ScaleLoader } from "react-spinners";
 import axios from "axios";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
@@ -18,17 +19,14 @@ export default function Playlist() {
   const [updater, setUpdater] = useState<Updater>();
   const [playlist, setPlaylist] = useState<SpotifyApi.PlaylistObjectFull>();
   const [tracks, _setTracks] = useState<PlaylistTrack[]>([]);
-  const [shownTracks, _setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [sort, setSort] = useState<Sort>("default");
   const [error, setError] = useState("");
   const router = useRouter();
   const id = router.query.id;
   const liked = id === "liked";
 
-  const setShownTracks = (tracks: PlaylistTrack[]) => _setShownTracks(sortTracks(sortOrder, sort, tracks));
-  const setTracks = (tracks: PlaylistTrack[]) => _setTracks(sortTracks(sortOrder, sort, tracks));
+  const setTracks = (tracks: PlaylistTrack[]) => _setTracks(sortTracks("asc", sort, tracks));
 
   const getPage = (pageNum: number) => {
     return new Promise<PlaylistTrack[]>((resolve, reject) => {
@@ -41,7 +39,11 @@ export default function Playlist() {
     })
   }
 
-  useEffect(() => console.log(error), [error]);
+  const loadMore = (page: number) => {
+    getPage(page).then((newTracks) => {
+      setTracks([...tracks, ...newTracks]);
+    })
+  }
 
   useEffect(() => {
     if (id !== undefined) {
@@ -50,26 +52,13 @@ export default function Playlist() {
           setPlaylist(res.data.playlist);
           setUpdater(new Updater({ clientId: res.data.clientId, clientSecret: res.data.clientSecret }));
 
-          getPage(1).then(async (pageZeroTracks) => {
-            setShownTracks(pageZeroTracks);
-
-            setTracks(pageZeroTracks);
-            for (let page = 1; page * 50 >= res.data.playlist.tracks.total; page++) {
-              const pageTracks = await getPage(page);
-              setTracks(tracks.concat(pageTracks));
-            }
+          getPage(0).then(async (pageOneTracks) => {
+            setTracks(pageOneTracks);
           });
         })
         .catch((err) => setError(err.toString()));
     }
   }, [id]);
-
-  useEffect(() => {
-    if (tracks.length === playlist?.tracks.total) {
-      setTracks(tracks);
-      setShownTracks(tracks.slice(0, 50));
-    }
-  }, [sort, sortOrder]);
 
   return (
     <div className="container">
@@ -99,10 +88,10 @@ export default function Playlist() {
         </select>
       </span>
       <span>
-        <select onChange={(e) => setSortOrder(e.target.value as SortOrder)} value={sortOrder}>
+        {/* <select onChange={(e) => setSortOrder(e.target.value as SortOrder)} value={sortOrder}>
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
-        </select>
+        </select> */}
       </span>
       {error && <span className="error">{error}</span>}
       <main>
@@ -165,25 +154,19 @@ export default function Playlist() {
           )}
         </div>
         <div className={styles.tracks}>
-          {shownTracks.length > 0 ? (
-            /*
-            You may be wondering why im still scroll-loading the tracks when i spent
-            a lot of time making it possible to get all the tracks at once. Well
-            rendering 800+ tracks literally crashes the browser. So having all the tracks
-            in memory makes sorting possible while still being usable.
-
-            thank you for coming to my ted talk
-            */
+          {tracks.length > 0 ? (
             <InfiniteScroll
-              pageStart={0}
-              hasMore={shownTracks.length < (playlist?.tracks.total ?? 0)}
-              loadMore={(page) => {
-                if (page > 1 && shownTracks.length > 0) {
-                  setShownTracks([...shownTracks, ...tracks.slice(shownTracks.length - 1, shownTracks.length + 49)]);
-                }
-              }}
+              initialLoad={false}
+              loader={
+                <div style={{ width: "100%", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                  <ScaleLoader color="#1DB954" />
+                </div>
+              }
+              pageStart={1}
+              hasMore={tracks.length < (playlist?.tracks.total ?? 0)}
+              loadMore={loadMore}
             >
-              {updater ? shownTracks.map((t, i) => (
+              {updater ? tracks.map((t, i) => (
                 <Result
                   {...t}
                   setShowModal={(v: boolean) => setModal(v ? i : -1)}
