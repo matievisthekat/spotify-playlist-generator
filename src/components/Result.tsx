@@ -1,7 +1,7 @@
 import { useState, MouseEvent as ReactMousEvent, useEffect } from "react";
 import Updater from "spotify-oauth-refresher";
 import { nanoid } from "nanoid";
-import moment from "moment";
+import ms from "ms";
 import FeatureDisplay from "./FeatureDisplay";
 import ExplicitIcon from "./ExplicitIcon";
 import Modal from "./Modal";
@@ -125,7 +125,7 @@ export default function Result({
         {added_at && (
           <span className={styles.plInfo}>
             <small>
-              {moment(added_at).fromNow()}
+              {ms(Date.now() - Date.parse(added_at), { long: true })} ago
               &nbsp;<strong>-</strong>&nbsp;
               <a href={added_by.external_urls.spotify} className={styles.link} target="_blank" rel="noreferrer">
                 {displayName}
