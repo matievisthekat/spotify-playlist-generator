@@ -197,7 +197,6 @@ export default function Generate(props: CredProps) {
             },
             updater
           ).catch((e) => {
-            console.log(e);
             setError(e.message || e.toString());
           });
         }}

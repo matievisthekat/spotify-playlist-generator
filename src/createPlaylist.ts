@@ -50,7 +50,7 @@ export const createPlaylist = (
               authType: "bearer",
             })
             .then(() => onProgress && onProgress((currentChunk / totalChunks) * 100))
-            .catch((err) => console.log(err.response?.data?.error?.message || err));
+            .catch((err) => console.error(err.response?.data?.error?.message || err));
 
           currentChunk++;
         }, 1000);

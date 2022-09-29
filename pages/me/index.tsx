@@ -63,7 +63,6 @@ export default function Me() {
 
   useEffect(() => {
     if (query) {
-      console.log(typeof search);
       if (typeof search === "function") search(0);
     }
   }, [query]);
