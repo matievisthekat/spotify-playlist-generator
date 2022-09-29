@@ -55,7 +55,10 @@ export default function Me() {
 
         const { clientId, clientSecret } = res.data;
         setUpdater(new Updater({ clientId, clientSecret }));
-      }).catch(setError);
+      }).catch((err) => {
+        console.error(err);
+        setError(err.message);
+      });
   }, []);
 
   useEffect(() => {
