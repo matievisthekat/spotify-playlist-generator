@@ -29,7 +29,7 @@ export function sortTracks(order: "asc" | "desc", sort: Sort, array: PlaylistTra
   return array.sort((a, b) => {
     switch (sort) {
       case "default":
-        return desc ? -1 : 1;
+        return desc ? 1 : -1;
 
       case "name":
         return desc ? b.track.name.localeCompare(a.track.name) : a.track.name.localeCompare(b.track.name);
