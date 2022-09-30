@@ -2,151 +2,81 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Updater from "spotify-oauth-refresher";
 import InfiniteScroll from "react-infinite-scroller";
+import { ScaleLoader } from "react-spinners";
+import axios from "axios";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
-import { CredProps, escapeHex, getCreds, requireLogin, Sort, sortTracks, SortOrder } from "../../../../src/util";
-import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
-import styles from "../../../../styles/pages/Playlist.module.sass";
 import FeatureDisplay from "../../../../src/components/FeatureDisplay";
+import { escapeHex, Sort, sortTracks, SortOrder } from "../../../../src/util";
+import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
+import { ApiMePlaylistIdResponse } from "../../../api/me/playlist/[id]";
+import { ApiMePlaylistTracksResponse } from "../../../api/me/playlist/[id]/tracks";
+import styles from "../../../../styles/pages/Playlist.module.sass";
 
-export async function getStaticPaths() {
-  return {
-    paths: [],
-    fallback: "blocking",
-  };
-}
-
-export async function getStaticProps() {
-  return {
-    props: getCreds(),
-  };
-}
-
-export default function Playlist({ clientId, clientSecret, authUrl }: CredProps) {
-  const updater = new Updater({ clientId, clientSecret });
-  const [pl, setPl] = useState<SpotifyApi.SinglePlaylistResponse>();
+export default function Playlist() {
+  const [updater, setUpdater] = useState<Updater>();
+  const [playlist, setPlaylist] = useState<SpotifyApi.PlaylistObjectFull>();
   const [tracks, _setTracks] = useState<PlaylistTrack[]>([]);
-  const [shownTracks, _setShownTracks] = useState<PlaylistTrack[]>([]);
   const [modal, setModal] = useState(-1);
-  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [sort, setSort] = useState<Sort>("default");
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
-  const id = router.query.id as string;
+  const id = router.query.id;
   const liked = id === "liked";
 
-  const setShownTracks = (tracks: PlaylistTrack[]) => _setShownTracks(sortTracks(sortOrder, sort, tracks));
-  const setTracks = (tracks: PlaylistTrack[]) => _setTracks(sortTracks(sortOrder, sort, tracks));
+  const setTracks = (tracks: PlaylistTrack[]) => _setTracks(sortTracks("asc", sort, tracks));
+
+  const getPage = (pageNum: number) => {
+    return new Promise<PlaylistTrack[]>((resolve, reject) => {
+      if (id === undefined) reject();
+      axios.get<ApiMePlaylistTracksResponse>(`/api/me/playlist/${id}/tracks?limit=50&offset=${pageNum * 50}`)
+        .then((res) => {
+          resolve(res.data.tracks);
+        })
+        .catch(reject);
+    })
+  }
+
+  const loadMore = (page: number) => {
+    getPage(page).then((newTracks) => {
+      setTracks([...tracks, ...newTracks]);
+    })
+  }
 
   useEffect(() => {
-    requireLogin(updater, authUrl);
+    if (id !== undefined) {
+      axios.get<ApiMePlaylistIdResponse>(`/api/me/playlist/${id}`)
+        .then((res) => {
+          setPlaylist(res.data.playlist);
+          setUpdater(new Updater({ clientId: res.data.clientId, clientSecret: res.data.clientSecret }));
 
-    if (!liked) {
-      updater
-        .request<SpotifyApi.SinglePlaylistResponse>({
-          url: `https://api.spotify.com/v1/playlists/${id}`,
-          authType: "bearer",
+          getPage(0).then(async (pageOneTracks) => {
+            setTracks(pageOneTracks);
+          });
         })
-        .then(({ data }) => setPl(data))
-        .catch((err) => {
-          console.error(err);
-          setError(err.message);
-        });
-    } else {
-      updater
-        .request<SpotifyApi.UsersSavedTracksResponse>({
-          url: `https://api.spotify.com/v1/me/tracks`,
-          authType: "bearer",
-        })
-        .then(({ data }) =>
-          setPl({
-            name: "Liked Songs",
-            followers: {
-              href: null,
-              total: 0,
-            },
-            tracks: {
-              href: "",
-              total: data.total,
-              limit: 50,
-              next: null,
-              previous: null,
-              items: [],
-              offset: 0,
-            },
-            collaborative: false,
-            description: "",
-            id: "liked",
-            images: [
-              {
-                url: "/liked.png",
-              },
-            ],
-            owner: {
-              uri: "https://open.spotify.com",
-              id: "",
-              display_name: "you",
-              external_urls: {
-                spotify: "https://open.spotify.com",
-              },
-              href: "",
-              type: "user",
-            },
-            public: false,
-            snapshot_id: "",
-            type: "playlist",
-            href: "",
-            external_urls: {
-              spotify: "https://open.spotify.com/collection/tracks",
-            },
-            uri: "",
-          })
-        )
-        .catch((err) => {
-          console.error(err);
-          setError(err.message);
-        });
+        .catch((err) => setError(err.toString()));
     }
-
-    getAllPlaylistTracks(updater, id)
-      .then((tracks) => {
-        setTracks(tracks);
-        setShownTracks(tracks.slice(0, 50));
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(err.message);
-      })
-      .finally(() => setLoading(false));
-  }, []);
-
-  useEffect(() => {
-    if (tracks.length === pl?.tracks.total) {
-      setTracks(tracks);
-      setShownTracks(tracks.slice(0, 50));
-    }
-  }, [sort, sortOrder]);
+  }, [id]);
 
   return (
     <div className="container">
-      {pl && (
+      {playlist && (
         <span className={styles.cover}>
-          <img src={pl.images[0].url} width={200} height={200} alt="Playlist cover image" />
+          <img src={playlist.images[0].url} width={200} height={200} alt="Playlist cover image" />
         </span>
       )}
       <h2>
-        {loading ? `Fetching playlist '${id}'...` : liked ? "Liked Songs" : pl ? pl.name : `Unknown`}
+        {liked ? "Liked Songs" : playlist ? playlist.name : `Unknown`}
         <GenerateButton href={`/me/playlist/${id}/generate`} />
       </h2>
-      {pl && (
+      {playlist && (
         <span className={styles.credits}>
-          Created by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.display_name}</ExternalLink>
+          Created by <ExternalLink href={playlist.owner.external_urls.spotify}>{playlist.owner.display_name}</ExternalLink>
         </span>
       )}
-      {pl && pl.description && <span>{escapeHex(pl.description)}</span>}
+      {playlist && playlist.description && <span>{escapeHex(playlist.description)}</span>}
       <span>
         <select onChange={(e) => setSort(e.target.value as Sort)} value={sort}>
           <option value="default">Default</option>
@@ -158,15 +88,15 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
         </select>
       </span>
       <span>
-        <select onChange={(e) => setSortOrder(e.target.value as SortOrder)} value={sortOrder}>
+        {/* <select onChange={(e) => setSortOrder(e.target.value as SortOrder)} value={sortOrder}>
           <option value="asc">Ascending</option>
           <option value="desc">Descending</option>
-        </select>
+        </select> */}
       </span>
       {error && <span className="error">{error}</span>}
       <main>
         <div className={styles.average}>
-          {tracks.length === pl?.tracks.total ? (
+          {tracks.length === playlist?.tracks.total ? (
             <>
               <FeatureDisplay
                 displayLike="number"
@@ -224,25 +154,19 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
           )}
         </div>
         <div className={styles.tracks}>
-          {tracks.length === pl?.tracks.total ? (
-            /*
-            You may be wondering why im still scroll-loading the tracks when i spent
-            a lot of time making it possible to get all the tracks at once. Well
-            rendering 800+ tracks litterally crashes the browser. So having all the tracks
-            in memory makes sorting possible while still being useable.
-
-            thank you for coming to my ted talk
-            */
+          {tracks.length > 0 ? (
             <InfiniteScroll
-              pageStart={0}
-              hasMore={shownTracks.length < tracks.length}
-              loadMore={(page) => {
-                if (page > 1) {
-                  setShownTracks([...shownTracks, ...tracks.slice(shownTracks.length - 1, shownTracks.length + 49)]);
-                }
-              }}
+              initialLoad={false}
+              loader={
+                <div style={{ width: "100%", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+                  <ScaleLoader color="#1DB954" />
+                </div>
+              }
+              pageStart={1}
+              hasMore={tracks.length < (playlist?.tracks.total ?? 0)}
+              loadMore={loadMore}
             >
-              {shownTracks.map((t, i) => (
+              {updater ? tracks.map((t, i) => (
                 <Result
                   {...t}
                   setShowModal={(v: boolean) => setModal(v ? i : -1)}
@@ -251,7 +175,7 @@ export default function Playlist({ clientId, clientSecret, authUrl }: CredProps)
                   key={i}
                   compact
                 />
-              ))}
+              )) : <></>}
             </InfiniteScroll>
           ) : (
             new Array(10).fill(null).map((_, i) => <SkeletonTrack key={i} />)

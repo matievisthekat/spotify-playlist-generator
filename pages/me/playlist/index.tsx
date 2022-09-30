@@ -1,8 +1,11 @@
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 export default function PlaylistIndex() {
+  const router = useRouter();
+
   useEffect(() => {
-    window.location.href = "/me";
+    router.push("/me");
   }, []);
   
   return null;

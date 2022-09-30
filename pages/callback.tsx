@@ -1,60 +1,61 @@
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 import qs from "querystring";
 import axios from "axios";
-import { CredProps, getCreds } from "../src/util";
-import Updater from "spotify-oauth-refresher";
+import { setCookie } from "cookies-next";
+import { getCreds, TokenCookies } from "../src/util";
+import { ServerResponse, IncomingMessage } from "http";
+import Link from "next/link";
 
-interface Props extends CredProps {
-  uri: string;
-}
+export async function getServerSideProps({ req, res, resolvedUrl }: { req: IncomingMessage, res: ServerResponse, resolvedUrl: string }) {
+  const creds = getCreds();
+  const base64 = Buffer.from(`${creds.clientId}:${creds.clientSecret}`).toString("base64url");
+  const { code } = qs.parse(resolvedUrl.split("?").pop() || "");
 
-export async function getStaticProps() {
-  return {
-    props: getCreds(),
-  };
-}
+  if (!code) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  }
 
-export default function Callback({ uri, clientId, clientSecret }: Props) {
-  const router = useRouter();
-  const updater = new Updater({ clientId, clientSecret });
+  const params = qs.stringify({
+    grant_type: "authorization_code",
+    code,
+    redirect_uri: creds.uri,
+  });
 
-  useEffect(() => {
-    const { code } = qs.parse(window.location.href.split("?")[1]);
-    if (code) {
-      axios
-        .post(
-          "https://accounts.spotify.com/api/token",
-          qs.stringify({
-            grant_type: "authorization_code",
-            code,
-            redirect_uri: uri,
-          }),
-          {
-            headers: {
-              Authorization: `Basic ${updater.base64Creds}`,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
-        )
-        .then(async ({ data }) => {
-          const { access_token, refresh_token } = data;
-          updater.setAccessToken(access_token).setRefreshToken(refresh_token);
-          router.push("/me");
-        })
-        .catch((err) => {
-          console.error(err);
-          router.push("/");
-        });
-    } else {
-      router.push("/");
+  const response = await axios.post("https://accounts.spotify.com/api/token", params, {
+    headers: {
+      Authorization: `Basic ${base64}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  }).catch((err) => console.error(err));
+
+  if (!response) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: true,
+      },
+    };
+  } else {
+    const { access_token, refresh_token } = response.data;
+    TokenCookies.setAccessToken(access_token, req, res).setRefreshToken(refresh_token, req, res);
+    return {
+      redirect: {
+        destination: "/me",
+        permanent: true
+      }
     }
-  }, []);
+  }
+}
 
+export default function Callback() {
   return (
     <div className="container">
       <main>
-        <h1>Redirecting...</h1>
+        <h1>Click <Link href={"/me"}>here</Link> to continue...</h1>
       </main>
     </div>
   );

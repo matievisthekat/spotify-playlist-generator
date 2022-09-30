@@ -1,5 +1,27 @@
 import Updater from "spotify-oauth-refresher";
 import { PlaylistTrack } from "./getPlaylistTracks";
+import { setCookie, getCookie } from "cookies-next";
+import { IncomingMessage, ServerResponse } from "http";
+
+export class TokenCookies {
+  static setAccessToken(token: string, req?: IncomingMessage, res?: ServerResponse) {
+    setCookie("access_token", token, { req, res });
+    return this;
+  }
+
+  static setRefreshToken(token: string, req?: IncomingMessage, res?: ServerResponse) {
+    setCookie("refresh_token", token, { req, res });
+    return this;
+  }
+
+  static accessToken(req?: IncomingMessage, res?: ServerResponse) {
+    return getCookie("access_token", { req, res })?.toString() ?? "";
+  }
+
+  static refreshToken(req?: IncomingMessage, res?: ServerResponse) {
+    return getCookie("refresh_token", { req, res })?.toString() ?? "";
+  }
+}
 
 export function sortTracks(order: "asc" | "desc", sort: Sort, array: PlaylistTrack[]) {
   const desc = order === "desc";
@@ -7,7 +29,7 @@ export function sortTracks(order: "asc" | "desc", sort: Sort, array: PlaylistTra
   return array.sort((a, b) => {
     switch (sort) {
       case "default":
-        return desc ? -1 : 1;
+        return desc ? 1 : -1;
 
       case "name":
         return desc ? b.track.name.localeCompare(a.track.name) : a.track.name.localeCompare(b.track.name);

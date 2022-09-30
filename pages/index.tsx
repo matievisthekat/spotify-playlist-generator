@@ -1,24 +1,16 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import Updater from "spotify-oauth-refresher";
 import ArrowForwardIcon from "@material-ui/icons/ArrowForward";
-import { CredProps, getCreds } from "../src/util";
+import { TokenCookies } from "../src/util";
 import styles from "../styles/pages/Home.module.sass";
 
-export async function getStaticProps() {
-  return {
-    props: getCreds(),
-  };
-}
-
-export default function Home({ clientId, clientSecret }: CredProps) {
-  const updater = new Updater({ clientId, clientSecret });
+export default function Home() {
   const description = "Generate playlists based on audio features (danceability, energy,tempo, etc...)";
   const title = "Spotify Playlist Generator";
 
   const [loggedIn, setLoggedIn] = useState(false);
-  useEffect(() => setLoggedIn(!!updater.refreshToken), []);
+  useEffect(() => setLoggedIn(!!TokenCookies.refreshToken()), []);
 
   return (
     <div className="container">
