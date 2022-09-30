@@ -16,7 +16,10 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const limit = parseInt(req.query.limit as string);
     const offset = parseInt(req.query.offset as string);
 
-    if (!accessToken || !refreshToken) return { redirect: { destination: "/login" } };
+    if (!accessToken || !refreshToken) {
+      resolve({ redirect: { destination: "/login" } });
+      return;
+    }
 
     const updater = new Updater({ clientId, clientSecret });
     updater.setAccessToken(accessToken).setRefreshToken(refreshToken);

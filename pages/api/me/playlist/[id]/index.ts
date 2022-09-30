@@ -7,83 +7,104 @@ export interface ApiMePlaylistIdResponse extends CredProps {
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { clientId, clientSecret } = getCreds();
-  const accessToken = TokenCookies.accessToken(req, res);
-  const refreshToken = TokenCookies.refreshToken(req, res);
-  const id = req.query.id as string;
-  const isLikedSongs = id ==="liked";
+  return new Promise<any>((resolve, reject) => {
+    const { clientId, clientSecret } = getCreds();
+    const accessToken = TokenCookies.accessToken(req, res);
+    const refreshToken = TokenCookies.refreshToken(req, res);
+    const id = req.query.id as string;
+    const isLikedSongs = id ==="liked";
 
-  if (!accessToken || !refreshToken) return { redirect: { destination: "/login" } };
+    if (!accessToken || !refreshToken) {
+      resolve({ redirect: { destination: "/login" } });
+      return;
+    }
 
-  const updater = new Updater({ clientId, clientSecret });
-  updater.setAccessToken(accessToken).setRefreshToken(refreshToken);
+    const updater = new Updater({ clientId, clientSecret });
+    updater.setAccessToken(accessToken).setRefreshToken(refreshToken);
 
-  if (isLikedSongs) {
-    updater
-      .request<SpotifyApi.UsersSavedTracksResponse>({
-        url: `https://api.spotify.com/v1/me/tracks`,
-        authType: "bearer",
-      })
-      .then((likedRes) => {
-        if (likedRes.status !== 200) return res.status(likedRes.status).json(likedRes.data);
+    if (isLikedSongs) {
+      updater
+        .request<SpotifyApi.UsersSavedTracksResponse>({
+          url: `https://api.spotify.com/v1/me/tracks`,
+          authType: "bearer",
+        })
+        .then((likedRes) => {
+          if (likedRes.status !== 200) {
+            res.status(likedRes.status).json(likedRes.data);
+            reject();
+            return;
+          }
 
-        const playlist = {
-          name: "Liked Songs",
-          followers: {
-            href: null,
-            total: 0,
-          },
-          tracks: {
-            href: "",
-            total: likedRes.data.total,
-            limit: 50,
-            next: null,
-            previous: null,
-            items: [],
-            offset: 0,
-          },
-          collaborative: false,
-          description: "",
-          id: "liked",
-          images: [
-            {
-              url: "/liked.png",
+          const playlist = {
+            name: "Liked Songs",
+            followers: {
+              href: null,
+              total: 0,
             },
-          ],
-          owner: {
-            uri: "https://open.spotify.com",
-            id: "",
-            display_name: "you",
+            tracks: {
+              href: "",
+              total: likedRes.data.total,
+              limit: 50,
+              next: null,
+              previous: null,
+              items: [],
+              offset: 0,
+            },
+            collaborative: false,
+            description: "",
+            id: "liked",
+            images: [
+              {
+                url: "/liked.png",
+              },
+            ],
+            owner: {
+              uri: "https://open.spotify.com",
+              id: "",
+              display_name: "you",
+              external_urls: {
+                spotify: "https://open.spotify.com",
+              },
+              href: "",
+              type: "user",
+            },
+            public: false,
+            snapshot_id: "",
+            type: "playlist",
+            href: "",
             external_urls: {
-              spotify: "https://open.spotify.com",
+              spotify: "https://open.spotify.com/collection/tracks",
             },
-            href: "",
-            type: "user",
-          },
-          public: false,
-          snapshot_id: "",
-          type: "playlist",
-          href: "",
-          external_urls: {
-            spotify: "https://open.spotify.com/collection/tracks",
-          },
-          uri: "",
-        };
+            uri: "",
+          };
 
-        res.status(200).json({ playlist, ...getCreds() })
-      })
-      .catch((err) => res.status(500).json(err))
-  } else {
-    updater
-      .request<SpotifyApi.SinglePlaylistResponse>({
-        url: `https://api.spotify.com/v1/playlists/${id}`,
-        authType: "bearer",
-      })
-      .then((plRes) => {
-        if (plRes.status !== 200) return res.status(plRes.status).json(plRes.data);
+          res.status(200).json({ playlist, ...getCreds() });
+          resolve(true);
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+          reject();
+        });
+    } else {
+      updater
+        .request<SpotifyApi.SinglePlaylistResponse>({
+          url: `https://api.spotify.com/v1/playlists/${id}`,
+          authType: "bearer",
+        })
+        .then((plRes) => {
+          if (plRes.status !== 200) {
+            res.status(plRes.status).json(plRes.data);
+            reject();
+            return;
+          }
 
-        res.status(200).json({ playlist: plRes.data, ...getCreds() });
-      })
-      .catch((err) => res.status(500).json(err));
-  }
+          res.status(200).json({ playlist: plRes.data, ...getCreds() });
+          resolve(true);
+        })
+        .catch((err) => {
+          res.status(500).json(err);
+          reject();
+        });
+    }
+  });
 }
