@@ -73,13 +73,11 @@ export default function Generate() {
       .then((res) => {
         setPl(res.data.playlist);
         setUpdater(new Updater({ clientId: res.data.clientId, clientSecret: res.data.clientSecret }));
+        setLoadingPlaylist(false);
       })
       .catch((err) => {
         console.error(err);
         setError(err.message);
-      })
-      .finally(() => {
-        setLoadingPlaylist(false);
       });
 
     setLoadingTracks(true);
@@ -102,7 +100,7 @@ export default function Generate() {
             <img src={pl.images[0].url} width={100} height={100} alt="Playlist cover image" />
           </span>
         )}
-        <h2 style={{ display: "block" }}>{loadingPlaylist ? `Fetching playlist ${id}...` : pl?.name}</h2>
+        <h2 style={{ display: "block" }}>{loadingPlaylist ? id : pl?.name}</h2>
         {pl && (
           <div className={styles.credits}>
             by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.display_name || pl.owner.id}</ExternalLink>
