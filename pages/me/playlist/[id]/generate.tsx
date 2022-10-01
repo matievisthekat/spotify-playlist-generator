@@ -97,7 +97,7 @@ export default function Generate() {
       <div className={styles.info}>
         {pl && (
           <span className={styles.image}>
-            <img src={pl.images[0].url} width={100} height={100} alt="Playlist cover image" />
+            <img src={pl.images[0].url} width={200} height={200} alt="Playlist cover image" />
           </span>
         )}
         <h2 style={{ display: "block" }}>{loadingPlaylist ? id : pl?.name}</h2>
@@ -150,7 +150,7 @@ export default function Generate() {
           />
           <button type="submit">Create</button>
         </div>
-        <div style={{ fontStyle: "italic" }}>
+        <div style={{ fontStyle: "italic", textAlign: "center" }}>
           Filter the tracks below, then click &quot;Create&quot; to create a new playlist with the filtered tracks!
         </div>
       </form>
