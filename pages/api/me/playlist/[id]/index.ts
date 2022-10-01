@@ -3,7 +3,7 @@ import Updater from "spotify-oauth-refresher";
 import { CredProps, getCreds, TokenCookies } from "../../../../../src/util";
 
 export interface ApiMePlaylistIdResponse extends CredProps {
-  playlist: SpotifyApi.PlaylistObjectFull;
+  playlist: SpotifyApi.SinglePlaylistResponse;
 }
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -15,6 +15,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const isLikedSongs = id ==="liked";
 
     if (!accessToken || !refreshToken) {
+      res.json({ redirect: { destination: "/login" } });
       resolve({ redirect: { destination: "/login" } });
       return;
     }
@@ -31,7 +32,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         .then((likedRes) => {
           if (likedRes.status !== 200) {
             res.status(likedRes.status).json(likedRes.data);
-            reject();
             return;
           }
 
@@ -83,7 +83,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         })
         .catch((err) => {
           res.status(500).json(err);
-          reject();
         });
     } else {
       updater
@@ -94,7 +93,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         .then((plRes) => {
           if (plRes.status !== 200) {
             res.status(plRes.status).json(plRes.data);
-            reject();
             return;
           }
 
@@ -103,7 +101,6 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         })
         .catch((err) => {
           res.status(500).json(err);
-          reject();
         });
     }
   });

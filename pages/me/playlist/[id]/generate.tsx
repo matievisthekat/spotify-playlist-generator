@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroller";
@@ -10,35 +11,15 @@ import { createPlaylist } from "../../../../src/createPlaylist";
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import { getCreds, CredProps } from "../../../../src/util";
 import styles from "../../../../styles/pages/Generate.module.sass";
+import { ApiMePlaylistIdResponse } from "../../../api/me/playlist/[id]";
 
-interface Playlist {
-  name: string;
-  desc: string | null;
-  url: string;
-  image: string;
-  total: number;
-  owner: SpotifyApi.UserObjectPublic;
-}
-
-export async function getStaticPaths() {
-  return {
-    paths: [],
-    fallback: "blocking",
-  };
-}
-
-export async function getStaticProps() {
-  return {
-    props: getCreds(),
-  };
-}
-
-export default function Generate(props: CredProps) {
-  const [pl, setPl] = useState<Playlist>();
+export default function Generate() {
+  const [updater, setUpdater] = useState<Updater>();
+  const [pl, setPl] = useState<SpotifyApi.PlaylistObjectFull>();
   const [newPlName, setNewPlName] = useState("");
   const [creating, setCreating] = useState(false);
   const [creatingProgress, setCreatingProgress] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loadingPlaylist, setLoadingPlaylist] = useState(false);
   const [loadingTracks, setLoadingTracks] = useState(false);
   const [tracks, setTracks] = useState<PlaylistTrack[]>();
   const [filteredTracks, setFilteredTracks] = useState<PlaylistTrack[]>();
@@ -53,10 +34,8 @@ export default function Generate(props: CredProps) {
   const [tempo, setTempo] = useState([0, 300]);
   const [modal, setModal] = useState(-1);
   const [error, setError] = useState<string>();
-  const updater = new Updater(props);
   const router = useRouter();
   const { id } = router.query;
-  const liked = id === "liked";
 
   useEffect(() => {
     if (filteredTracks) setShownTracks(filteredTracks.slice(0, 49));
@@ -88,62 +67,23 @@ export default function Generate(props: CredProps) {
   }, [tracks, danceability, acousticness, energy, instrumentalness, liveness, speechiness, valence, tempo]);
 
   useEffect(() => {
-    setLoading(true);
+    setLoadingPlaylist(true);
+
+    axios.get<ApiMePlaylistIdResponse>(`/api/me/playlist/${id}`)
+      .then((res) => {
+        setPl(res.data.playlist);
+        setUpdater(new Updater({ clientId: res.data.clientId, clientSecret: res.data.clientSecret }));
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoadingPlaylist(false);
+      });
 
     setLoadingTracks(true);
-    getAllPlaylistTracks(updater, id as string)
-      .then((plTracks) => setTracks(plTracks))
-      .finally(() => setLoadingTracks(false));
-
-    if (liked) {
-      updater
-        .request<SpotifyApi.UsersSavedTracksResponse>({
-          url: "https://api.spotify.com/v1/me/tracks",
-          authType: "bearer",
-        })
-        .then(({ data }) =>
-          setPl({
-            name: "Liked Songs",
-            desc: "Songs you have liked",
-            url: "https://open.spotify.com/collection/tracks",
-            image: "/liked.png",
-            owner: {
-              id: "you",
-              href: "https://open.spotify.com",
-              type: "user",
-              uri: "spotify:user:me",
-              external_urls: { spotify: "https://open.spotify.com" },
-            },
-            total: data.total,
-          })
-        )
-        .catch((err) => {
-          console.error(err);
-          setError(err?.message);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      updater
-        .request<SpotifyApi.SinglePlaylistResponse>({
-          url: `https://api.spotify.com/v1/playlists/${id}`,
-          authType: "bearer",
-        })
-        .then(({ data }) =>
-          setPl({
-            name: data.name,
-            desc: data.description,
-            url: data.external_urls.spotify,
-            image: data.images[0].url,
-            owner: data.owner,
-            total: data.tracks.total,
-          })
-        )
-        .catch((err) => {
-          console.error(err);
-          setError(err?.message);
-        })
-        .finally(() => setLoading(false));
-    }
+    
   }, []);
 
   if (creating)
@@ -159,10 +99,10 @@ export default function Generate(props: CredProps) {
       <div className={styles.info}>
         {pl && (
           <span className={styles.image}>
-            <img src={pl.image} width={100} height={100} alt="Playlist cover image" />
+            <img src={pl.images[0].url} width={100} height={100} alt="Playlist cover image" />
           </span>
         )}
-        <h2 style={{ display: "block" }}>{loading ? `Fetching playlist ${id}...` : pl?.name}</h2>
+        <h2 style={{ display: "block" }}>{loadingPlaylist ? `Fetching playlist ${id}...` : pl?.name}</h2>
         {pl && (
           <div className={styles.credits}>
             by <ExternalLink href={pl.owner.external_urls.spotify}>{pl.owner.display_name || pl.owner.id}</ExternalLink>
@@ -174,31 +114,32 @@ export default function Generate(props: CredProps) {
         onSubmit={async (e) => {
           e.preventDefault();
           if (!newPlName) return setError("No playlist name provided");
-          if (!filteredTracks)
-            return setError("You can't create a playlist with no tracks! Maybe try some different filters");
+          if (!filteredTracks) return setError("You can't create a playlist with no tracks! Maybe try some different filters");
+          
+            if (updater) {
+            setCreating(true);
+            setError(undefined);
 
-          setCreating(true);
-          setError(undefined);
+            const { data } = await updater.request<SpotifyApi.UserObjectPublic>({
+              method: "GET",
+              url: "https://api.spotify.com/v1/me",
+              authType: "bearer",
+            });
 
-          const { data } = await updater.request<SpotifyApi.UserObjectPublic>({
-            method: "GET",
-            url: "https://api.spotify.com/v1/me",
-            authType: "bearer",
-          });
-
-          await createPlaylist(
-            newPlName,
-            data.id,
-            {
-              tracks: filteredTracks,
-              pub: true,
-              onDone: (pl) => router.push(`/me/playlist/${pl.id}`),
-              onProgress: setCreatingProgress,
-            },
-            updater
-          ).catch((e) => {
-            setError(e.message || e.toString());
-          });
+            await createPlaylist(
+              newPlName,
+              data.id,
+              {
+                tracks: filteredTracks,
+                pub: true,
+                onDone: (pl) => router.push(`/me/playlist/${pl.id}`),
+                onProgress: setCreatingProgress,
+              },
+              updater
+            ).catch((e) => {
+              setError(e.message || e.toString());
+            });
+          }
         }}
       >
         <div>
@@ -273,7 +214,7 @@ export default function Generate(props: CredProps) {
                 }
               }}
             >
-              {shownTracks.map((t, i) => (
+              {updater && shownTracks.map((t, i) => (
                 <Result
                   track={t.track}
                   features={t.features}
@@ -288,7 +229,7 @@ export default function Generate(props: CredProps) {
               ))}
             </InfiniteScroll>
           ) : (
-            filteredTracks.map((t, i) => (
+            updater && filteredTracks.map((t, i) => (
               <Result
                 track={t.track}
                 features={t.features}
