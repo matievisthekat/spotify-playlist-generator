@@ -7,6 +7,8 @@ import ExplicitIcon from "./ExplicitIcon";
 import Modal from "./Modal";
 import { categories, CategoryName, toProperCase } from "../util";
 import styles from "../../styles/components/Result.module.sass";
+import axios from "axios";
+import { ApiGetUserByHref } from "../../pages/api/getUserByHref";
 
 interface Props {
   showModal: boolean;
@@ -73,12 +75,7 @@ export default function Result({
   // TODO: create API endpoint for fetching users
   useEffect(() => {
     if (added_by.uri !== "spotify:user:me" && added_by.uri !== "spotify:user:spotify") {
-      updater
-        .request<SpotifyApi.UserObjectPublic>({
-          method: "GET",
-          url: added_by.href,
-          authType: "bearer",
-        })
+      axios.get<ApiGetUserByHref>(`/api/getUserByHref?href=${added_by.href}`)
         .then(({ data }) => setDisplayName(data.display_name || "unknown"))
         .catch((err) => {
           console.error(err);
