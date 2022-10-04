@@ -9,7 +9,7 @@ import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
 import FeatureDisplay from "../../../../src/components/FeatureDisplay";
-import { escapeHex, Sort, sortTracks, SortOrder } from "../../../../src/util";
+import { escapeHex, Sort, sortTracks } from "../../../../src/util";
 import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import { ApiMePlaylistIdResponse } from "../../../api/me/playlist/[id]";
 import { ApiMePlaylistTracksResponse } from "../../../api/me/playlist/[id]/tracks";
