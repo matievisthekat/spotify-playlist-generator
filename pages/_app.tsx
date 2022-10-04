@@ -17,6 +17,7 @@ Router.events.on("routeChangeComplete", () => progress.done());
 Router.events.on("routeChangeError", () => progress.done());
 
 function App({ Component, pageProps }: AppProps) {
+  // TODO: clear this bug up
   const Comp = Component as any;
   return (
     <>

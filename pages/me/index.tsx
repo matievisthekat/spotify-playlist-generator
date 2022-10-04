@@ -2,7 +2,7 @@ import { useEffect, useState, forwardRef } from "react";
 import Link from "next/link";
 import Updater from "spotify-oauth-refresher";
 import axios from "axios";
-import { DebounceInput } from "react-debounce-input";
+import { DebounceInput as _DebounceInput } from "react-debounce-input";
 import InfiniteScroll from "react-infinite-scroller";
 import { ScaleLoader } from "react-spinners";
 import Result from "../../src/components/Result";
@@ -13,6 +13,8 @@ import { ApiMeResponse } from "../api/me";
 import { ApiSearchResponse } from "../api/me/search";
 
 const PlaylistWithRef = forwardRef(Playlist);
+// TODO: clear this bug up
+const DebounceInput = _DebounceInput as any;
 
 export default function Me() {
   const [me, setMe] = useState<SpotifyApi.CurrentUsersProfileResponse>();
@@ -114,7 +116,7 @@ export default function Me() {
               minLength={3}
               debounceTimeout={500}
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onChange={(e: any) => setQuery(e.target.value)}
               style={{ marginBottom: "2rem" }}
             />
 
