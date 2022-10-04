@@ -20,7 +20,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     const updater = new Updater({ clientId, clientSecret });
     updater.setAccessToken(accessToken).setRefreshToken(refreshToken);
 
-    const body: { name: string, tracks: PlaylistTrack[] } = JSON.parse(req.body);
+    const body: { name: string, tracks: PlaylistTrack[] } = req.body;
 
     if (!body.tracks) {
       res.status(400).json({ error: "Missing 'tracks' body field" });
@@ -57,7 +57,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         let currentChunk = 0;
 
         const interval: NodeJS.Timer = setInterval(() => {
-          if (currentChunk > totalChunks) {
+          if (currentChunk >= totalChunks) {
             clearInterval(interval);
             res.status(201).json(data);
             resolve(data);

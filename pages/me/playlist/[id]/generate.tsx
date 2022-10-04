@@ -8,19 +8,17 @@ import DoubleSliderInput from "../../../../src/components/DoubleSliderInput";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
-import { createPlaylist } from "../../../../src/createPlaylist";
 import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import styles from "../../../../styles/pages/Generate.module.sass";
 import { ApiMePlaylistIdResponse } from "../../../api/me/playlist/[id]";
-import { ApiMePlaylistTracksResponse } from "../../../api/me/playlist/[id]/tracks";
 import { ApiMePlaylistIdGenerateResponse } from "../../../api/me/playlist/[id]/generate";
+import { ApiMePlaylistAllTracksResponse } from "../../../api/me/playlist/[id]/allTracks";
 
 export default function Generate() {
   const [updater, setUpdater] = useState<Updater>();
   const [pl, setPl] = useState<SpotifyApi.PlaylistObjectFull>();
   const [newPlName, setNewPlName] = useState("");
   const [creating, setCreating] = useState(false);
-  const [creatingProgress, setCreatingProgress] = useState(0);
   const [loadingPlaylist, setLoadingPlaylist] = useState(false);
   const [loadingTracks, setLoadingTracks] = useState(false);
   const [tracks, setTracks] = useState<PlaylistTrack[]>([]);
@@ -47,22 +45,22 @@ export default function Generate() {
     setFilteredTracks(
       tracks?.filter(({ features }) => {
         return (
-          (features?.danceability ?? 0) * 100 > danceability[0] &&
-          (features?.danceability ?? 0) < danceability[1] &&
-          (features?.acousticness ?? 0) * 100 > acousticness[0] &&
-          (features?.acousticness ?? 0) * 100 < acousticness[1] &&
-          (features?.energy ?? 0) * 100 > energy[0] &&
-          (features?.energy ?? 0) * 100 < energy[1] &&
-          (features?.instrumentalness ?? 0) * 100 > instrumentalness[0] &&
-          (features?.instrumentalness ?? 0) * 100 < instrumentalness[1] &&
-          (features?.liveness ?? 0) * 100 > liveness[0] &&
-          (features?.liveness ?? 0) * 100 < liveness[1] &&
-          (features?.speechiness ?? 0) * 100 > speechiness[0] &&
-          (features?.speechiness ?? 0) * 100 < speechiness[1] &&
-          (features?.valence ?? 0) * 100 > valence[0] &&
-          (features?.valence ?? 0) * 100 < valence[1] &&
-          (features?.tempo ?? 0) > tempo[0] &&
-          (features?.tempo ?? 0) < tempo[1]
+          (features?.danceability ?? 0) * 100 >= danceability[0] &&
+          (features?.danceability ?? 0) <= danceability[1] &&
+          (features?.acousticness ?? 0) * 100 >= acousticness[0] &&
+          (features?.acousticness ?? 0) * 100 <= acousticness[1] &&
+          (features?.energy ?? 0) * 100 >= energy[0] &&
+          (features?.energy ?? 0) * 100 <= energy[1] &&
+          (features?.instrumentalness ?? 0) * 100 >= instrumentalness[0] &&
+          (features?.instrumentalness ?? 0) * 100 <= instrumentalness[1] &&
+          (features?.liveness ?? 0) * 100 >= liveness[0] &&
+          (features?.liveness ?? 0) * 100 <= liveness[1] &&
+          (features?.speechiness ?? 0) * 100 >= speechiness[0] &&
+          (features?.speechiness ?? 0) * 100 <= speechiness[1] &&
+          (features?.valence ?? 0) * 100 >= valence[0] &&
+          (features?.valence ?? 0) * 100 <= valence[1] &&
+          (features?.tempo ?? 0) >= tempo[0] &&
+          (features?.tempo ?? 0) <= tempo[1]
         );
       })
     );
@@ -77,18 +75,13 @@ export default function Generate() {
         setUpdater(new Updater({ clientId: data.clientId, clientSecret: data.clientSecret }));
 
         setLoadingTracks(true);
-        for (let i = 0; i < Math.ceil(data.playlist.tracks.total / 50); i++) {
-          axios.get<ApiMePlaylistTracksResponse>(`/api/me/playlist/${id}/tracks?limit=50&offset=${i * 50}`)
-            .then(({ data: trackData }) => {
-              setTracks(tracks.concat(trackData.tracks));
-              console.log(`${tracks.length}/${data.playlist.tracks.total}`)
-            })
-            .catch((err) => {
-              console.error(err);
-              setError(err.message);
-            })
-            .finally(() => setLoadingTracks(false));
-        }
+        axios.get<ApiMePlaylistAllTracksResponse>(`/api/me/playlist/${id}/allTracks`)
+          .then(({ data: trackData }) => setTracks(trackData.tracks))
+          .catch((err) => {
+            console.error(err);
+            setError(err.message);
+          })
+          .finally(() => setLoadingTracks(false));
       })
       .catch((err) => {
         console.error(err);
@@ -100,8 +93,7 @@ export default function Generate() {
   if (creating)
     return (
       <div className={styles.creatingOverlay} style={{ textAlign: "center", marginTop: "10px" }}>
-        <h1>{creatingProgress}%</h1>
-        {error && <h2 className="error">{error}</h2>}
+        <CircularProgress variant="indeterminate" style={{ color: "#1DB954" }} />
       </div>
     );
 
