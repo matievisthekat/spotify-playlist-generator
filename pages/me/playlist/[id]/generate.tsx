@@ -2,16 +2,17 @@ import axios from "axios";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroller";
+import { CircularProgress } from "@material-ui/core";
 import Updater from "spotify-oauth-refresher";
 import DoubleSliderInput from "../../../../src/components/DoubleSliderInput";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import SkeletonTrack from "../../../../src/components/SkeletonTrack";
 import { createPlaylist } from "../../../../src/createPlaylist";
-import { getAllPlaylistTracks, PlaylistTrack } from "../../../../src/getPlaylistTracks";
-import { getCreds, CredProps } from "../../../../src/util";
+import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import styles from "../../../../styles/pages/Generate.module.sass";
 import { ApiMePlaylistIdResponse } from "../../../api/me/playlist/[id]";
+import { ApiMePlaylistTracksResponse } from "../../../api/me/playlist/[id]/tracks";
 
 export default function Generate() {
   const [updater, setUpdater] = useState<Updater>();
@@ -21,7 +22,7 @@ export default function Generate() {
   const [creatingProgress, setCreatingProgress] = useState(0);
   const [loadingPlaylist, setLoadingPlaylist] = useState(false);
   const [loadingTracks, setLoadingTracks] = useState(false);
-  const [tracks, setTracks] = useState<PlaylistTrack[]>();
+  const [tracks, setTracks] = useState<PlaylistTrack[]>([]);
   const [filteredTracks, setFilteredTracks] = useState<PlaylistTrack[]>();
   const [shownTracks, setShownTracks] = useState<PlaylistTrack[]>([]);
   const [danceability, setDanceability] = useState([0, 100]);
@@ -70,18 +71,29 @@ export default function Generate() {
     setLoadingPlaylist(true);
 
     axios.get<ApiMePlaylistIdResponse>(`/api/me/playlist/${id}`)
-      .then((res) => {
-        setPl(res.data.playlist);
-        setUpdater(new Updater({ clientId: res.data.clientId, clientSecret: res.data.clientSecret }));
-        setLoadingPlaylist(false);
+      .then(({ data }) => {
+        setPl(data.playlist);
+        setUpdater(new Updater({ clientId: data.clientId, clientSecret: data.clientSecret }));
+
+        setLoadingTracks(true);
+        for (let i = 0; i < Math.ceil(data.playlist.tracks.total / 50); i++) {
+          axios.get<ApiMePlaylistTracksResponse>(`/api/me/playlist/${id}/tracks?limit=50&offset=${i * 50}`)
+            .then(({ data: trackData }) => {
+              setTracks(tracks.concat(trackData.tracks));
+              console.log(`${tracks.length}/${data.playlist.tracks.total}`)
+            })
+            .catch((err) => {
+              console.error(err);
+              setError(err.message);
+            })
+            .finally(() => setLoadingTracks(false));
+        }
       })
       .catch((err) => {
         console.error(err);
         setError(err.message);
-      });
-
-    setLoadingTracks(true);
-    
+      })
+      .finally(() => setLoadingPlaylist(false));
   }, []);
 
   if (creating)
@@ -118,6 +130,7 @@ export default function Generate() {
             setCreating(true);
             setError(undefined);
 
+            // TODO: create api endpoint for creating playlist
             const { data } = await updater.request<SpotifyApi.UserObjectPublic>({
               method: "GET",
               url: "https://api.spotify.com/v1/me",
