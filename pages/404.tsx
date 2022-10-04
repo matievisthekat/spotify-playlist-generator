@@ -1,4 +1,4 @@
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Mathias from "../public/mathias.png";
