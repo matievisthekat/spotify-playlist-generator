@@ -13,6 +13,7 @@ import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import styles from "../../../../styles/pages/Generate.module.sass";
 import { ApiMePlaylistIdResponse } from "../../../api/me/playlist/[id]";
 import { ApiMePlaylistTracksResponse } from "../../../api/me/playlist/[id]/tracks";
+import { ApiMePlaylistIdGenerateResponse } from "../../../api/me/playlist/[id]/generate";
 
 export default function Generate() {
   const [updater, setUpdater] = useState<Updater>();
@@ -130,26 +131,17 @@ export default function Generate() {
             setCreating(true);
             setError(undefined);
 
-            // TODO: create api endpoint for creating playlist
-            const { data } = await updater.request<SpotifyApi.UserObjectPublic>({
-              method: "GET",
-              url: "https://api.spotify.com/v1/me",
-              authType: "bearer",
-            });
-
-            await createPlaylist(
-              newPlName,
-              data.id,
-              {
-                tracks: filteredTracks,
-                pub: true,
-                onDone: (pl) => router.push(`/me/playlist/${pl.id}`),
-                onProgress: setCreatingProgress,
-              },
-              updater
-            ).catch((e) => {
-              setError(e.message || e.toString());
-            });
+            axios.post<ApiMePlaylistIdGenerateResponse>(`/api/me/playlist/${id}/generate`, {
+              tracks: filteredTracks,
+              name: newPlName,
+            })
+              .then(({ data }) => {
+                router.push(`/me/playlist/${data.id}`)
+              })
+              .catch((err) => {
+                setError(err.message || err.toString());
+              })
+              .finally(() => setCreating(false));
           }
         }}
       >
