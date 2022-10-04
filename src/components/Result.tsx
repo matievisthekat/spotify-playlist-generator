@@ -70,6 +70,7 @@ export default function Result({
     });
   }
 
+  // TODO: create API endpoint for fetching users
   useEffect(() => {
     if (added_by.uri !== "spotify:user:me" && added_by.uri !== "spotify:user:spotify") {
       updater
