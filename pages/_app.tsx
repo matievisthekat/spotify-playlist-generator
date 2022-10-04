@@ -17,11 +17,12 @@ Router.events.on("routeChangeComplete", () => progress.done());
 Router.events.on("routeChangeError", () => progress.done());
 
 function App({ Component, pageProps }: AppProps) {
+  const Comp = Component as any;
   return (
     <>
       <Seo />
       <NavPath />
-      <Component {...pageProps} />
+      <Comp {...pageProps} />
     </>
   );
 }
