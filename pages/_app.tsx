@@ -26,8 +26,8 @@ function App({ Component, pageProps }: AppProps) {
       <Seo />
       
       <script id="google-ad-sense" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4374857081025109" crossOrigin="anonymous"></script>
-      <script id="google-tag-manager" async src="https://www.googletagmanager.com/gtag/js?id=G-7DMRTCSBEV"></script>
-      <script id="google-analytics" async>
+      <script id="google-tag-manager" defer src="https://www.googletagmanager.com/gtag/js?id=G-7DMRTCSBEV"></script>
+      <script id="google-analytics" defer>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
