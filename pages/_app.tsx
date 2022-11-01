@@ -26,6 +26,7 @@ function App({ Component, pageProps }: AppProps) {
     <>
       <Seo />
       
+      <Script id="google-ad-sense" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4374857081025109" crossOrigin="anonymous"></Script>
       <Script id="google-tag-manager" strategy="lazyOnload" src="https://www.googletagmanager.com/gtag/js?id=G-7DMRTCSBEV"></Script>
       <Script id="google-analytics" strategy="lazyOnload">
         {`
