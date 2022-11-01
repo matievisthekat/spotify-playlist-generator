@@ -14,6 +14,7 @@ import { PlaylistTrack } from "../../../../src/getPlaylistTracks";
 import { ApiMePlaylistIdResponse } from "../../../api/me/playlist/[id]";
 import { ApiMePlaylistTracksResponse } from "../../../api/me/playlist/[id]/tracks";
 import styles from "../../../../styles/pages/Playlist.module.sass";
+import DefaultAd from "../../../../src/components/DefaultAd";
 
 export default function Playlist() {
   const [updater, setUpdater] = useState<Updater>();
@@ -167,14 +168,17 @@ export default function Playlist() {
               loadMore={loadMore}
             >
               {updater ? tracks.map((t, i) => (
-                <Result
-                  {...t}
-                  setShowModal={(v: boolean) => setModal(v ? i : -1)}
-                  showModal={modal === i}
-                  updater={updater}
-                  key={i}
-                  compact
-                />
+                <>
+                  {i % 10 == 0 && <DefaultAd key={i} />}
+                  <Result
+                    {...t}
+                    setShowModal={(v: boolean) => setModal(v ? i : -1)}
+                    showModal={modal === i}
+                    updater={updater}
+                    key={t.track.id}
+                    compact
+                  />
+                </>
               )) : <></>}
             </InfiniteScroll>
           ) : (
