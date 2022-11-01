@@ -1,6 +1,7 @@
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import Router from "next/router";
+import Script from "next/script";
 import progress from "nprogress";
 import NavPath from "../src/components/NavPath";
 import Seo from "../src/components/Seo";
@@ -31,15 +32,13 @@ function App({ Component, pageProps }: AppProps) {
       </Head>
       
       <script id="google-tag-manager" defer src="https://www.googletagmanager.com/gtag/js?id=G-7DMRTCSBEV"></script>
-      <script id="google-analytics" defer>
-        {`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
+      <Script id="google-analytics" defer>
+        {`window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
 
-          gtag('config', 'G-7DMRTCSBEV');
-        `}
-      </script>
+        gtag('config', 'G-7DMRTCSBEV');`}
+      </Script>
       
       <NavPath />
       <Comp {...pageProps} />
