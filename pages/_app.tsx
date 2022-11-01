@@ -1,7 +1,5 @@
 import type { AppProps } from "next/app";
-import Head from "next/head";
 import Router from "next/router";
-import Script from "next/script";
 import progress from "nprogress";
 import NavPath from "../src/components/NavPath";
 import Seo from "../src/components/Seo";
@@ -27,9 +25,9 @@ function App({ Component, pageProps }: AppProps) {
     <>
       <Seo />
       
-      <Script id="google-ad-sense" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4374857081025109" crossOrigin="anonymous"></Script>
-      <Script id="google-tag-manager" strategy="lazyOnload" src="https://www.googletagmanager.com/gtag/js?id=G-7DMRTCSBEV"></Script>
-      <Script id="google-analytics" strategy="lazyOnload">
+      <script id="google-ad-sense" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4374857081025109" crossOrigin="anonymous"></script>
+      <script id="google-tag-manager" async src="https://www.googletagmanager.com/gtag/js?id=G-7DMRTCSBEV"></script>
+      <script id="google-analytics" async>
         {`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
@@ -37,7 +35,7 @@ function App({ Component, pageProps }: AppProps) {
 
           gtag('config', 'G-7DMRTCSBEV');
         `}
-      </Script>
+      </script>
       
       <NavPath />
       <Comp {...pageProps} />
