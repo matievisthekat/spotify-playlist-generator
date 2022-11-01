@@ -1,4 +1,5 @@
 import type { AppProps } from "next/app";
+import Head from "next/head";
 import Router from "next/router";
 import progress from "nprogress";
 import NavPath from "../src/components/NavPath";
@@ -24,8 +25,11 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Seo />
+
+      <Head>
+        <script id="google-ad-sense" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4374857081025109" crossOrigin="anonymous"></script>
+      </Head>
       
-      <script id="google-ad-sense" async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4374857081025109" crossOrigin="anonymous"></script>
       <script id="google-tag-manager" defer src="https://www.googletagmanager.com/gtag/js?id=G-7DMRTCSBEV"></script>
       <script id="google-analytics" defer>
         {`
