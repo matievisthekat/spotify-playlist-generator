@@ -4,7 +4,6 @@ import Router from "next/router";
 import Script from "next/script";
 import progress from "nprogress";
 import NavPath from "../src/components/NavPath";
-import Seo from "../src/components/Seo";
 import "../styles/globals.sass";
 
 progress.configure({
@@ -25,29 +24,14 @@ function App({ Component, pageProps }: AppProps) {
   const Comp = Component as any;
   return (
     <>
-      <Seo />
-      
-      <Script
-        id="google-adsense"
-        data-ad-client="ca-pub-4374857081025109"
-        async={true}
-        strategy="beforeInteractive"
-        crossOrigin="anonymous"
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4374857081025109"
-        onError={(e) => console.error('AdSense script failed to load: ', e)}
-      ></Script>
-      <Script
-        id="google-tag-manager"
-        strategy="beforeInteractive"
-        src="https://www.googletagmanager.com/gtag/js?id=G-7DMRTCSBEV"
-      ></Script>
-      <Script id="google-analytics" strategy="beforeInteractive">
-        {`window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-7DMRTCSBEV');`}
-      </Script>
-      
+      <Head>
+        <title>Spotify Playlist Generator</title>
+        <link rel="icon" href="/favicon.ico" />
+        <meta
+          name="description"
+          content="Generate playlists based on song features (danceability, energy, positivity, etc...)"
+        />
+      </Head>
       <NavPath />
       <Comp {...pageProps} />
     </>
