@@ -1,12 +1,9 @@
-import Seo from "../src/components/Seo";
 import { categories, toProperCase } from "../src/util";
 import styles from "../styles/pages/Categories.module.sass";
 
 export default function Categories() {
   return (
     <div className="container">
-      <Seo title="Categories" />
-
       <main>
         <h1 className={styles.title}>
           <span className="accent">Categories</span>
