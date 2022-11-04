@@ -3,6 +3,12 @@ import Updater from "spotify-oauth-refresher";
 import { getAllPlaylistTracks, PlaylistTrack } from "../../../../../src/getPlaylistTracks";
 import { getCreds, TokenCookies } from "../../../../../src/util";
 
+export const config = {
+  api: {
+    responseLimit: false,
+  },
+}
+
 export interface ApiMePlaylistAllTracksResponse {
   tracks: PlaylistTrack[];
 }
