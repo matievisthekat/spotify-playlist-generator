@@ -67,28 +67,29 @@ export default function Generate() {
   }, [tracks, danceability, acousticness, energy, instrumentalness, liveness, speechiness, valence, tempo]);
 
   useEffect(() => {
-    setLoadingPlaylist(true);
+    if (id !== undefined) {
+      setLoadingPlaylist(true);
+      axios.get<ApiMePlaylistIdResponse>(`/api/me/playlist/${id}`)
+        .then(({ data }) => {
+          setPl(data.playlist);
+          setUpdater(new Updater({ clientId: data.clientId, clientSecret: data.clientSecret }));
 
-    axios.get<ApiMePlaylistIdResponse>(`/api/me/playlist/${id}`)
-      .then(({ data }) => {
-        setPl(data.playlist);
-        setUpdater(new Updater({ clientId: data.clientId, clientSecret: data.clientSecret }));
-
-        setLoadingTracks(true);
-        axios.get<ApiMePlaylistAllTracksResponse>(`/api/me/playlist/${id}/allTracks`)
-          .then(({ data: trackData }) => setTracks(trackData.tracks))
-          .catch((err) => {
-            console.error(err);
-            setError(err.message);
-          })
-          .finally(() => setLoadingTracks(false));
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(err.message);
-      })
-      .finally(() => setLoadingPlaylist(false));
-  }, []);
+          setLoadingTracks(true);
+          axios.get<ApiMePlaylistAllTracksResponse>(`/api/me/playlist/${id}/allTracks`)
+            .then(({ data: trackData }) => setTracks(trackData.tracks))
+            .catch((err) => {
+              console.error(err);
+              setError(err.message);
+            })
+            .finally(() => setLoadingTracks(false));
+        })
+        .catch((err) => {
+          console.error(err);
+          setError(err.message);
+        })
+        .finally(() => setLoadingPlaylist(false));
+    }
+  }, [id]);
 
   if (creating)
     return (
