@@ -66,7 +66,7 @@ export default function Playlist() {
     <div className="container">
       {playlist && (
         <span className={styles.cover}>
-          <img src={playlist.images[0].url} width={200} height={200} alt="Playlist cover image" />
+          <img src={playlist.images[0]?.url} width={200} height={200} alt="Playlist cover image" />
         </span>
       )}
       <h2>
