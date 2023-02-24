@@ -21,6 +21,7 @@ export default function Me() {
   const [playlists, setPlaylists] = useState<SpotifyApi.PlaylistObjectSimplified[]>([]);
   const [error, setError] = useState("");
   const [searchErr, setSearchErr] = useState("");
+  const [searchLoading, setSearchLoading] = useState(false);
   const [results, setResults] = useState<(SpotifyApi.TrackObjectFull & { audio_features: SpotifyApi.AudioFeaturesObject })[]>();
   const [showMorePl, setShowMorePl] = useState(false);
   const [query, setQuery] = useState("");
@@ -31,6 +32,7 @@ export default function Me() {
   const username = me?.id;
 
   const search = (offset: number) => {
+    setSearchLoading(true);
     axios.get<ApiSearchResponse>("/api/me/search", {
       params: {
         query,
@@ -46,6 +48,9 @@ export default function Me() {
       .catch((err) => {
         console.error(err);
         setSearchErr(err.message);
+      })
+      .finally(() => {
+        setSearchLoading(false);
       });
   };
 
@@ -149,7 +154,7 @@ export default function Me() {
                     />
                   ))}
                 </InfiniteScroll>
-              ) : (
+              ) : !searchLoading && (
                 <div style={{ marginBottom: "30px" }}>no results</div>
               )}
             </div>
