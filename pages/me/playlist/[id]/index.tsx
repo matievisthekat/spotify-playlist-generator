@@ -4,6 +4,7 @@ import Updater from "spotify-oauth-refresher";
 import InfiniteScroll from "react-infinite-scroller";
 import { ScaleLoader } from "react-spinners";
 import axios from "axios";
+import he from "he";
 import ExternalLink from "../../../../src/components/ExternalLink";
 import Result from "../../../../src/components/Result";
 import GenerateButton from "../../../../src/components/GenerateButton";
@@ -77,7 +78,7 @@ export default function Playlist() {
           Created by <ExternalLink href={playlist.owner.external_urls.spotify}>{playlist.owner.display_name}</ExternalLink>
         </span>
       )}
-      {playlist && playlist.description && <span>{escapeHex(playlist.description)}</span>}
+      {playlist && playlist.description && <span>{escapeHex(he.decode(playlist.description))}</span>}
       <span>
         <select onChange={(e) => setSort(e.target.value as Sort)} value={sort}>
           <option value="default">Default</option>
