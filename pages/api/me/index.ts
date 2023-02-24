@@ -28,37 +28,50 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         url: "https://api.spotify.com/v1/me",
         authType: "bearer"
       })
-      .then((meRes) => {
+      .then(async (meRes) => {
         if (meRes.status !== 200) {
           res.status(500).json(meRes);
           reject();
           return;
         }
 
-        updater
-          .request<SpotifyApi.ListOfCurrentUsersPlaylistsResponse>({
+        let done = false;
+        let offset = 0;
+        const playlists: SpotifyApi.PlaylistObjectSimplified[] = [];
+        while (!done) {
+          const plRes = await updater.request<SpotifyApi.ListOfCurrentUsersPlaylistsResponse>({
             url: "https://api.spotify.com/v1/me/playlists",
+            params: {
+              limit: 50,
+              offset,
+            },
             authType: "bearer",
-          })
-          .then((plRes) => {
-            if (plRes.status !== 200) {
-              res.status(500).json(meRes);
-              reject();
-              return;
-            }
-
-            res.status(200).json({
-              me: meRes.data,
-              playlists: plRes.data.items,
-              clientId,
-              clientSecret
-            });
-            resolve(true);
-          })
-          .catch((err) => {
+          }).catch((err) => {
             res.status(500).json(err);
             reject();
           });
+
+          if (!plRes || plRes.data.items.length < 1) {
+            done = true;
+          } else if (plRes.status !== 200) {
+            res.status(500).json(meRes);
+            reject();
+            done = true;
+            return;
+          } else {
+            playlists.push(...plRes.data.items);
+            offset += 50;
+          }
+        }
+
+        
+        res.status(200).json({
+          me: meRes.data,
+          playlists,
+          clientId,
+          clientSecret
+        });
+        resolve(true);
       })
       .catch((err) => {
         res.status(500).json(err);
