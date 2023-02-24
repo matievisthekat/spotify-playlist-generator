@@ -96,7 +96,7 @@ export default function Me() {
                 <>
                   {(showMorePl ? playlists : playlists.slice(0, initialPlaylists)).map((p, i) => (
                     <Link href={`/me/playlist/${p.id}`} key={i} passHref>
-                      <PlaylistWithRef img={p.images[0].url} name={p.name} />
+                      <PlaylistWithRef img={p.images[0]?.url} name={p.name} />
                     </Link>
                   ))}
                   {playlists.length > initialPlaylists && (
