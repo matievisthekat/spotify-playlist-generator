@@ -28,7 +28,7 @@
     "react-infinite-scroller": "^1.2.6",
     "react-spinners": "^0.12.0",
     "sass": "^1.52.0",
-    "spotify-oauth-refresher": "^1.0.6",
+    "spotify-oauth-refresher": "^1.0.9",
     "universal-cookie": "^4.0.4"
   },
   "devDependencies": {
